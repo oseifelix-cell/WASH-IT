@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WASH-IT — WS Debug</title>
+<style>
+  body{margin:0;background:#0a1420;color:#cfe6ff;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+  header{padding:10px 14px;background:#06101c;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid #14304a}
+  input{background:#0d2137;border:1px solid #1c4a6e;color:#cfe6ff;padding:7px 10px;border-radius:6px;width:280px;font-family:inherit}
+  button{background:#0e7c5a;border:0;color:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:700}
+  button.alt{background:#243b55}
+  .wrap{display:grid;grid-template-columns:300px 1fr;gap:0;height:calc(100vh - 52px)}
+  .panel{padding:14px;overflow:auto}
+  .left{border-right:1px solid #14304a}
+  .phase-big{font-size:30px;font-weight:800;color:#00e5a0;margin:4px 0 14px}
+  .kv{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #102338}
+  .kv b{color:#7fb5e6;font-weight:400}
+  .kv span{color:#fff;font-weight:700}
+  .counts{margin-top:14px}
+  .counts div{padding:3px 0;color:#9ab}
+  #log{white-space:pre-wrap;line-height:1.45}
+  .t-prime{color:#8ab}.t-soap{color:#ffcf6b}.t-getset{color:#9fd}.t-run{color:#7fffd0}
+  .t-remediate{color:#ff9f6b}.t-rinse{color:#9fd}.t-done{color:#00e5a0}
+  .dim{color:#5a7a9a}
+  img{max-width:100%;border-radius:8px;border:1px solid #1c4a6e;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+  <input id="url" value="ws://localhost:8001/ws">
+  <button onclick="connect()">Connect</button>
+  <button class="alt" onclick="sendReset()">Send reset</button>
+  <button class="alt" onclick="disconnect()">Disconnect</button>
+  <span id="status" class="dim">idle</span>
+</header>
+<div class="wrap">
+  <div class="panel left">
+    <div class="dim">CURRENT PHASE</div>
+    <div class="phase-big" id="phase">—</div>
+    <div class="kv"><b>visibility_ok</b><span id="vis">—</span></div>
+    <div class="kv"><b>buffer_fill</b><span id="buf">—</span></div>
+    <div class="kv"><b>state</b><span id="state">—</span></div>
+    <div class="kv"><b>fps</b><span id="fps">—</span></div>
+    <div class="kv"><b>current_step</b><span id="cs">—</span></div>
+    <div class="kv"><b>predicted_step</b><span id="ps">—</span></div>
+    <div class="kv"><b>slot_left</b><span id="sl">—</span></div>
+    <div class="kv"><b>phase_remaining</b><span id="pr">—</span></div>
+    <div class="kv"><b>redo_step</b><span id="rs">—</span></div>
+    <div class="kv"><b>completed_steps</b><span id="comp">—</span></div>
+    <div class="kv"><b>messages</b><span id="msgs">0</span></div>
+    <div class="counts" id="counts"></div>
+    <img id="frame" alt="">
+  </div>
+  <div class="panel">
+    <div class="dim">PHASE TRANSITIONS &amp; SNAPSHOTS (newest at bottom)</div>
+    <div id="log"></div>
+  </div>
+</div>
+
+<script>
+let ws = null, msgCount = 0, lastPhase = null, snapAt = 0;
+const counts = {};
+
+function setStatus(t, ok) {
+  const el = document.getElementById('status');
+  el.textContent = t;
+  el.style.color = ok ? '#00e5a0' : '#ff6b6b';
+}
+function log(html) {
+  const el = document.getElementById('log');
+  el.innerHTML += html + '\n';
+  el.parentElement.scrollTop = el.parentElement.scrollHeight;
+}
+function cls(phase) { return 't-' + String(phase || '').toLowerCase(); }
+
+function connect() {
+  if (ws) ws.close();
+  msgCount = 0; lastPhase = null;
+  for (const k in counts) delete counts[k];
+  document.getElementById('log').innerHTML = '';
+  const url = document.getElementById('url').value.trim();
+  log('<span class="dim">connecting to ' + url + ' …</span>');
+  ws = new WebSocket(url);
+
+  ws.onopen = function () {
+    setStatus('connected', true);
+    log('<span class="dim">open — sending reset</span>');
+    ws.send('reset');   // same thing the real UI does on connect
+  };
+  ws.onclose = function (e) {
+    setStatus('closed (code ' + e.code + ')', false);
+    log('<span class="dim">closed, code ' + e.code + '</span>');
+  };
+  ws.onerror = function () { setStatus('error — server reachable?', false); };
+  ws.onmessage = function (ev) {
+    let s;
+    try { s = JSON.parse(ev.data); } catch (err) { log('parse error'); return; }
+    msgCount++;
+    document.getElementById('msgs').textContent = msgCount;
+
+    const phase = s.phase || '(none)';
+    counts[phase] = (counts[phase] || 0) + 1;
+    renderCounts();
+
+    // live fields
+    set('phase', phase); document.getElementById('phase').className = 'phase-big';
+    document.getElementById('phase').style.color = '#00e5a0';
+    set('vis', s.visibility_ok);
+    set('buf', s.buffer_fill != null ? Math.round(s.buffer_fill * 100) + '%' : '—');
+    set('state', s.state);
+    set('fps', s.fps);
+    set('cs', s.current_step);
+    set('ps', s.predicted_step);
+    set('sl', s.slot_left);
+    set('pr', s.phase_remaining);
+    set('rs', s.redo_step);
+    set('comp', JSON.stringify(s.completed_steps || []));
+
+    if (s.frame) document.getElementById('frame').src = 'data:image/jpeg;base64,' + s.frame;
+
+    // log every phase transition
+    if (phase !== lastPhase) {
+      log('<span class="' + cls(phase) + '">[' + ts() + '] PHASE -> ' + phase +
+          '   (vis=' + s.visibility_ok + ', buf=' +
+          (s.buffer_fill != null ? Math.round(s.buffer_fill * 100) + '%' : '?') +
+          ', state=' + s.state + ', fps=' + s.fps + ')</span>');
+      lastPhase = phase;
+    }
+    // periodic snapshot (every ~1.5s) so the log shows ongoing state without spamming
+    const now = Date.now();
+    if (now - snapAt > 1500) {
+      snapAt = now;
+      let extra = '';
+      if (phase === 'RUN') extra = 'step ' + (s.current_step + 1) + '/7, pred=' + s.predicted_step + ', slot_left=' + s.slot_left;
+      else if (phase === 'SOAP' || phase === 'RINSE') extra = 'remaining=' + s.phase_remaining + ', state=' + s.state;
+      else if (phase === 'REMEDIATE') extra = 'redo_step=' + s.redo_step + ', remaining=' + s.redo_remaining;
+      else extra = 'vis=' + s.visibility_ok + ', buf=' + (s.buffer_fill != null ? Math.round(s.buffer_fill * 100) + '%' : '?');
+      log('<span class="dim">[' + ts() + '] ' + phase + ': ' + extra + '</span>');
+    }
+  };
+}
+function sendReset() { if (ws && ws.readyState === 1) { ws.send('reset'); log('<span class="dim">(sent reset)</span>'); } }
+function disconnect() { if (ws) ws.close(); }
+function set(id, v) { document.getElementById(id).textContent = (v === undefined ? '—' : v); }
+function renderCounts() {
+  let h = '<div class="dim">message counts by phase:</div>';
+  for (const k in counts) h += '<div>' + k + ': ' + counts[k] + '</div>';
+  document.getElementById('counts').innerHTML = h;
+}
+function ts() { return new Date().toLocaleTimeString(); }
+</script>
+</body>
+</html>

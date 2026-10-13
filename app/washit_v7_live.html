@@ -1,0 +1,2123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WASH-IT — Interactive Demo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Playfair+Display:wght@700;900&family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700;800&display=swap');
+
+/* ═══════════════════════════════════════════
+   THEME SYSTEM — CSS variables per theme
+═══════════════════════════════════════════ */
+
+:root {
+  --bg:       #03080f;
+  --app-bg:   #06111f;
+  --surface:  #0d2137;
+  --surface2: #0a1929;
+  --border:   rgba(0,180,255,0.15);
+  --border2:  rgba(0,180,255,0.08);
+  --accent:   #00b4ff;
+  --accent2:  #00e5a0;
+  --grad:     linear-gradient(135deg,#00b4ff,#00e5a0);
+  --grad90:   linear-gradient(90deg,#00b4ff,#00e5a0);
+  --text:     #e8f4ff;
+  --muted:    #4a6a8a;
+  --muted2:   #5a7a9a;
+  --nav-bg:   #040d17;
+  --font-head:'Outfit',sans-serif;
+  --font-body:'Outfit',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --radius:   14px;
+  --radius-lg:18px;
+  --shadow:   0 0 80px rgba(0,180,255,0.07);
+  --glow:     drop-shadow(0 0 18px rgba(0,180,255,0.2));
+  --ok-bg:    rgba(0,229,160,.07);
+  --ok-bd:    rgba(0,229,160,.4);
+  --ok-col:   #00e5a0;
+  --warn-bg:  rgba(255,179,0,.06);
+  --warn-bd:  rgba(255,179,0,.3);
+  --warn-col: #ffb300;
+  --err-bg:   rgba(255,68,85,.07);
+  --err-bd:   rgba(255,68,85,.4);
+  --err-col:  #ff4455;
+  --step-bg:  rgba(0,180,255,0.065);
+  --ring-bg:  rgba(0,180,255,0.06);
+  --ring-bd:  #00b4ff;
+  --badge-ok-bg:  rgba(0,229,160,.1);
+  --badge-ok-bd:  rgba(0,229,160,.4);
+  --badge-ok-col: #00e5a0;
+  --badge-miss-bg:  rgba(255,68,85,.08);
+  --badge-miss-bd:  rgba(255,68,85,.3);
+  --badge-miss-col: #ff4455;
+}
+
+/* ── THEME: Clinical White ─────────────────── */
+[data-theme="clinical"] {
+  --bg:       #f0f4f8;
+  --app-bg:   #ffffff;
+  --surface:  #f7faff;
+  --surface2: #eef2f8;
+  --border:   rgba(0,120,200,0.18);
+  --border2:  rgba(0,120,200,0.08);
+  --accent:   #0071e3;
+  --accent2:  #00a86b;
+  --grad:     linear-gradient(135deg,#0071e3,#00a86b);
+  --grad90:   linear-gradient(90deg,#0071e3,#00a86b);
+  --text:     #0d1b2a;
+  --muted:    #6b7c93;
+  --muted2:   #8a9bb0;
+  --nav-bg:   #ffffff;
+  --font-head:'Space Grotesk',sans-serif;
+  --font-body:'Space Grotesk',sans-serif;
+  --shadow:   0 4px 40px rgba(0,80,180,0.08);
+  --glow:     drop-shadow(0 0 10px rgba(0,113,227,0.15));
+  --ok-bg:    rgba(0,168,107,.07);
+  --ok-bd:    rgba(0,168,107,.35);
+  --ok-col:   #007a4d;
+  --warn-bg:  rgba(255,149,0,.06);
+  --warn-bd:  rgba(255,149,0,.3);
+  --warn-col: #b36a00;
+  --err-bg:   rgba(200,30,30,.05);
+  --err-bd:   rgba(200,30,30,.3);
+  --err-col:  #c01e1e;
+  --step-bg:  rgba(0,113,227,0.06);
+  --ring-bg:  rgba(0,113,227,0.06);
+  --ring-bd:  #0071e3;
+  --badge-ok-bg:  rgba(0,168,107,.1);
+  --badge-ok-bd:  rgba(0,168,107,.35);
+  --badge-ok-col: #007a4d;
+  --badge-miss-bg:  rgba(200,30,30,.07);
+  --badge-miss-bd:  rgba(200,30,30,.3);
+  --badge-miss-col: #c01e1e;
+}
+
+/* ── THEME: Sunset Warm ──────────────────── */
+[data-theme="sunset"] {
+  --bg:       #0f0a05;
+  --app-bg:   #1a0f06;
+  --surface:  #2a1a0a;
+  --surface2: #221408;
+  --border:   rgba(255,140,0,0.2);
+  --border2:  rgba(255,140,0,0.08);
+  --accent:   #ff8c00;
+  --accent2:  #ff3d71;
+  --grad:     linear-gradient(135deg,#ff8c00,#ff3d71);
+  --grad90:   linear-gradient(90deg,#ff8c00,#ff3d71);
+  --text:     #fff4e8;
+  --muted:    #7a5a3a;
+  --muted2:   #9a7a5a;
+  --nav-bg:   #120b04;
+  --font-head:'Outfit',sans-serif;
+  --font-body:'Outfit',sans-serif;
+  --shadow:   0 0 80px rgba(255,140,0,0.08);
+  --glow:     drop-shadow(0 0 18px rgba(255,140,0,0.25));
+  --ok-bg:    rgba(255,140,0,.08);
+  --ok-bd:    rgba(255,140,0,.4);
+  --ok-col:   #ff8c00;
+  --warn-bg:  rgba(255,200,0,.07);
+  --warn-bd:  rgba(255,200,0,.35);
+  --warn-col: #ffcc00;
+  --err-bg:   rgba(255,61,113,.08);
+  --err-bd:   rgba(255,61,113,.4);
+  --err-col:  #ff3d71;
+  --step-bg:  rgba(255,140,0,0.06);
+  --ring-bg:  rgba(255,140,0,0.07);
+  --ring-bd:  #ff8c00;
+  --badge-ok-bg:  rgba(255,140,0,.1);
+  --badge-ok-bd:  rgba(255,140,0,.4);
+  --badge-ok-col: #ff8c00;
+  --badge-miss-bg:  rgba(255,61,113,.08);
+  --badge-miss-bd:  rgba(255,61,113,.3);
+  --badge-miss-col: #ff3d71;
+}
+
+/* ── THEME: Forest Green ─────────────────── */
+[data-theme="forest"] {
+  --bg:       #040d08;
+  --app-bg:   #071410;
+  --surface:  #0e2318;
+  --surface2: #0b1c13;
+  --border:   rgba(0,210,120,0.18);
+  --border2:  rgba(0,210,120,0.07);
+  --accent:   #00d478;
+  --accent2:  #7dff6b;
+  --grad:     linear-gradient(135deg,#00d478,#7dff6b);
+  --grad90:   linear-gradient(90deg,#00d478,#7dff6b);
+  --text:     #e8fff2;
+  --muted:    #3a6a4a;
+  --muted2:   #5a8a6a;
+  --nav-bg:   #050e09;
+  --font-head:'Syne',sans-serif;
+  --font-body:'Outfit',sans-serif;
+  --shadow:   0 0 80px rgba(0,212,120,0.07);
+  --glow:     drop-shadow(0 0 18px rgba(0,212,120,0.25));
+  --ok-bg:    rgba(0,212,120,.08);
+  --ok-bd:    rgba(0,212,120,.4);
+  --ok-col:   #00d478;
+  --warn-bg:  rgba(255,220,0,.07);
+  --warn-bd:  rgba(255,220,0,.35);
+  --warn-col: #ffe000;
+  --err-bg:   rgba(255,70,70,.08);
+  --err-bd:   rgba(255,70,70,.35);
+  --err-col:  #ff4646;
+  --step-bg:  rgba(0,212,120,0.06);
+  --ring-bg:  rgba(0,212,120,0.07);
+  --ring-bd:  #00d478;
+  --badge-ok-bg:  rgba(0,212,120,.1);
+  --badge-ok-bd:  rgba(0,212,120,.4);
+  --badge-ok-col: #00d478;
+  --badge-miss-bg:  rgba(255,70,70,.08);
+  --badge-miss-bd:  rgba(255,70,70,.3);
+  --badge-miss-col: #ff4646;
+}
+
+/* ── THEME: Royal Purple ─────────────────── */
+[data-theme="royal"] {
+  --bg:       #08040f;
+  --app-bg:   #110820;
+  --surface:  #1c1035;
+  --surface2: #160d2a;
+  --border:   rgba(160,100,255,0.2);
+  --border2:  rgba(160,100,255,0.08);
+  --accent:   #a064ff;
+  --accent2:  #ff64d8;
+  --grad:     linear-gradient(135deg,#a064ff,#ff64d8);
+  --grad90:   linear-gradient(90deg,#a064ff,#ff64d8);
+  --text:     #f4eeff;
+  --muted:    #5a3a7a;
+  --muted2:   #7a5a9a;
+  --nav-bg:   #090518;
+  --font-head:'Playfair Display',serif;
+  --font-body:'Outfit',sans-serif;
+  --shadow:   0 0 80px rgba(160,100,255,0.08);
+  --glow:     drop-shadow(0 0 18px rgba(160,100,255,0.25));
+  --ok-bg:    rgba(100,255,180,.07);
+  --ok-bd:    rgba(100,255,180,.35);
+  --ok-col:   #64ffb4;
+  --warn-bg:  rgba(255,200,64,.07);
+  --warn-bd:  rgba(255,200,64,.35);
+  --warn-col: #ffc840;
+  --err-bg:   rgba(255,60,100,.08);
+  --err-bd:   rgba(255,60,100,.4);
+  --err-col:  #ff3c64;
+  --step-bg:  rgba(160,100,255,0.06);
+  --ring-bg:  rgba(160,100,255,0.07);
+  --ring-bd:  #a064ff;
+  --badge-ok-bg:  rgba(100,255,180,.1);
+  --badge-ok-bd:  rgba(100,255,180,.35);
+  --badge-ok-col: #64ffb4;
+  --badge-miss-bg:  rgba(255,60,100,.08);
+  --badge-miss-bd:  rgba(255,60,100,.3);
+  --badge-miss-col: #ff3c64;
+}
+
+
+/* ── THEME: Pure White ─────────────────────── */
+[data-theme="white"] {
+  --bg:       #f5f5f7;
+  --app-bg:   #ffffff;
+  --surface:  #f5f5f7;
+  --surface2: #ebebed;
+  --border:   rgba(0,0,0,0.1);
+  --border2:  rgba(0,0,0,0.05);
+  --accent:   #1d7afc;
+  --accent2:  #30b47e;
+  --grad:     linear-gradient(135deg,#1d7afc,#30b47e);
+  --grad90:   linear-gradient(90deg,#1d7afc,#30b47e);
+  --text:     #1d1d1f;
+  --muted:    #86868b;
+  --muted2:   #6e6e73;
+  --nav-bg:   #fafafa;
+  --font-head:'Outfit',sans-serif;
+  --font-body:'Outfit',sans-serif;
+  --shadow:   0 2px 40px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+  --glow:     drop-shadow(0 0 10px rgba(29,122,252,0.15));
+  --ok-bg:    rgba(48,180,126,.08);
+  --ok-bd:    rgba(48,180,126,.35);
+  --ok-col:   #1a8a5a;
+  --warn-bg:  rgba(200,130,0,.07);
+  --warn-bd:  rgba(200,130,0,.3);
+  --warn-col: #a06800;
+  --err-bg:   rgba(200,30,30,.06);
+  --err-bd:   rgba(200,30,30,.25);
+  --err-col:  #cc1e1e;
+  --step-bg:  rgba(29,122,252,0.05);
+  --ring-bg:  rgba(29,122,252,0.06);
+  --ring-bd:  #1d7afc;
+  --badge-ok-bg:  rgba(48,180,126,.1);
+  --badge-ok-bd:  rgba(48,180,126,.3);
+  --badge-ok-col: #1a8a5a;
+  --badge-miss-bg:  rgba(200,30,30,.07);
+  --badge-miss-bd:  rgba(200,30,30,.25);
+  --badge-miss-col: #cc1e1e;
+}
+[data-theme="white"] #app::before { opacity: 0.4; }
+[data-theme="white"] .demo-btn { color: #ffffff; }
+[data-theme="white"] .step-card { box-shadow: 0 1px 8px rgba(0,0,0,0.07); }
+[data-theme="white"] .meter-card,
+[data-theme="white"] .conf-card,
+[data-theme="white"] .steps-card,
+[data-theme="white"] .sum-card,
+[data-theme="white"] .lead-item,
+[data-theme="white"] .top3-card { box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+[data-theme="white"] .nav { box-shadow: 0 1px 0 rgba(0,0,0,0.08); }
+
+/* ════════════════════════════════════════════
+   BASE STYLES  (use CSS vars throughout)
+════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-body);background:var(--bg);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px;transition:background .4s}
+#app{background:var(--app-bg);width:100%;max-width:980px;border-radius:20px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:var(--shadow);transition:all .4s}
+#app::before{display:none}
+
+.th-btn{padding:5px 14px;border-radius:50px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;transition:all .25s;white-space:nowrap}
+.th-btn:hover{color:var(--text);border-color:var(--accent)}
+.th-btn.active{background:var(--grad);border-color:transparent;color:#fff}
+[data-theme="clinical"] .th-btn.active{color:#0d1b2a}
+
+/* nav */
+.nav{display:flex;gap:0;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--nav-bg);z-index:1;position:relative}
+.nav-btn{padding:11px 22px;font-family:var(--font-body);font-size:15px;font-weight:600;border:none;background:transparent;color:var(--muted);cursor:pointer;letter-spacing:.4px;border-bottom:2px solid transparent;transition:all .2s}
+.nav-btn:hover{color:var(--text)}
+.nav-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.scr{display:none;z-index:1;position:relative;flex:1;flex-direction:column}
+.scr.on{display:flex}
+
+/* ── IDLE ── */
+#s-idle{align-items:center;justify-content:center;gap:22px;text-align:center;padding:48px 40px;min-height:540px}
+.ring{width:118px;height:118px;border-radius:50%;border:2px solid var(--ring-bd);display:flex;align-items:center;justify-content:center;position:relative;animation:pr 2.5s ease-in-out infinite;background:var(--ring-bg)}
+.ring::before{content:'';position:absolute;inset:-11px;border-radius:50%;border:1px solid var(--border);animation:pr 2.5s ease-in-out infinite .4s}
+@keyframes pr{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.7}}
+.ring-ico{font-size:54px}
+.idle-title{font-size:76px;font-weight:900;letter-spacing:-3px;line-height:1;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--font-head)}
+.idle-sub{font-size:15px;color:var(--muted);letter-spacing:4px;text-transform:uppercase;margin-top:4px}
+.idle-prompt{font-size:19px;color:var(--text);padding:12px 32px;border:1px solid var(--border);border-radius:50px;background:var(--ring-bg);animation:bb 1.8s ease-in-out infinite}
+@keyframes bb{0%,100%{border-color:var(--border2)}50%{border-color:var(--accent)}}
+.dots{display:flex;gap:9px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--muted);opacity:.35}
+.demo-btn{padding:14px 42px;border:none;border-radius:50px;background:var(--grad);color:#fff;font-family:var(--font-body);font-size:19px;font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.demo-btn:hover{transform:scale(1.03)}
+[data-theme="clinical"] .demo-btn{color:#0d1b2a}
+[data-theme="forest"] .demo-btn{color:#040d08}
+.speed-row{display:flex;align-items:center;gap:10px}
+.speed-row label{font-size:15px;color:var(--muted)}
+.speed-row select{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font-body);font-size:15px;padding:6px 12px;border-radius:8px;cursor:pointer}
+.idle-note{font-size:15px;color:var(--muted);max-width:380px;line-height:1.7;text-align:center}
+
+/* ── SESSION ── */
+#s-session{padding:18px 22px;gap:14px;min-height:540px}
+.s-hdr{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.s-logo{font-size:26px;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--font-head)}
+.s-timer{font-family:var(--font-mono);font-size:26px;color:var(--accent);background:var(--ring-bg);padding:7px 18px;border-radius:50px;border:1px solid var(--border);letter-spacing:2px}
+.s-live{font-size:14px;color:var(--ok-col);display:flex;align-items:center;gap:6px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--ok-col);animation:lp 1.2s ease-in-out infinite}
+@keyframes lp{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.65)}}
+.s-body{display:grid;grid-template-columns:1fr 290px;gap:14px;flex:1;min-height:0}
+.left-p{display:flex;flex-direction:column;gap:10px}
+.top-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:stretch}
+.top-row.cam-hidden{grid-template-columns:1fr}
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 24px;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+.cam-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 18px;display:flex;flex-direction:column;gap:8px}
+.cam-wrap{border-radius:12px;overflow:hidden;aspect-ratio:4/3;background:#000;display:flex;align-items:center;justify-content:center;max-height:220px}
+.cam-wrap img{width:100%;height:100%;object-fit:cover}
+.step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad90);border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.step-lbl{font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--accent)}
+.step-num-bg{font-size:97px;font-weight:900;line-height:1;color:var(--step-bg);position:absolute;right:16px;top:10px;font-family:var(--font-mono)}
+.step-name{font-size:35px;font-weight:700;line-height:1.1;color:var(--text);letter-spacing:-.5px;max-width:62%;font-family:var(--font-head)}
+.diag-area{flex:1;display:flex;align-items:center;justify-content:center;min-height:145px;padding:4px 0}
+.diag-area img{max-height:145px;max-width:100%;object-fit:contain;border-radius:10px;border:1px solid var(--border)}
+.fb-banner{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;display:flex;align-items:center;gap:12px;min-height:58px;transition:all .3s}
+.fb-banner.ok{border-color:var(--ok-bd);background:var(--ok-bg)}
+.fb-banner.warn{border-color:var(--warn-bd);background:var(--warn-bg)}
+.fb-banner.err{border-color:var(--err-bd);background:var(--err-bg)}
+.fb-ico{font-size:26px;flex-shrink:0}
+.fb-txt{font-size:17px;line-height:1.4;color:var(--text)}
+.fb-txt b{color:var(--accent)}
+.right-p{display:flex;flex-direction:column;gap:10px}
+.meter-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0}
+.meter-wrap{position:relative;width:110px;height:110px}
+.meter-wrap svg{transform:rotate(-90deg)}
+.meter-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.meter-pct{font-size:31px;font-weight:900;font-family:var(--font-mono);background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.meter-sub{font-size:12px;color:var(--muted);letter-spacing:1px}
+.meter-lbl{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.step-counter{font-size:26px;font-weight:700;color:var(--text);font-family:var(--font-mono)}
+.step-counter span{color:var(--ok-col)}
+.conf-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;flex-shrink:0}
+.card-lbl{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.conf-wrap{background:rgba(128,128,128,.1);border-radius:6px;height:10px;overflow:hidden}
+.conf-fill{height:100%;border-radius:6px;background:var(--grad90);transition:width .25s ease;width:0%}
+.conf-val{font-family:var(--font-mono);font-size:31px;font-weight:700;color:var(--accent);margin-top:6px}
+.det-lbl{font-size:13px;color:var(--muted);margin-top:2px}
+.det-lbl span{color:var(--text);font-weight:600}
+.steps-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;flex:1;overflow-y:auto}
+.steps-ttl{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.si{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border2);transition:all .35s}
+.si:last-child{border-bottom:none}
+.si-chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;color:var(--muted);font-family:var(--font-mono);font-weight:700;transition:all .35s}
+.si.done .si-chk{background:var(--ok-col);border-color:var(--ok-col);color:var(--app-bg)}
+.si.cur .si-chk{border-color:var(--accent);color:var(--accent);animation:cp 1.5s ease-in-out infinite}
+@keyframes cp{0%,100%{box-shadow:0 0 0 0 rgba(128,128,255,.3)}50%{box-shadow:0 0 0 5px rgba(128,128,255,.1)}}
+.si-name{font-size:14px;color:var(--muted);transition:all .35s}
+.si.done .si-name{color:var(--ok-col)}
+.si.cur .si-name{color:var(--text);font-weight:600}
+.si.done{opacity:.75}
+.manual-row{display:flex;gap:7px;flex-wrap:wrap;padding:10px 16px;background:var(--nav-bg);border-top:1px solid var(--border2);flex-shrink:0}
+.man-lbl{font-size:13px;color:var(--muted);display:flex;align-items:center;margin-right:2px}
+.man-btn{padding:7px 14px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--accent);font-family:var(--font-body);font-size:14px;cursor:pointer;transition:all .2s}
+.man-btn:hover{background:var(--ring-bg)}
+.man-btn.red{border-color:var(--err-bd);color:var(--err-col)}
+.man-btn.amber{border-color:var(--warn-bd);color:var(--warn-col)}
+
+/* overlays */
+.flash{position:absolute;inset:0;pointer-events:none;z-index:10;opacity:0;transition:opacity .07s;border-radius:20px}
+.flash.green-f{background:rgba(0,229,160,.12)}
+.flash.red-f{background:rgba(255,40,60,.18)}
+.flash.show{opacity:1}
+.wrong-alert{position:absolute;inset:0;z-index:20;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.8);border-radius:20px}
+.wrong-alert.show{display:flex}
+.wa-box{background:var(--surface);border:2px solid var(--err-col);border-radius:var(--radius-lg);padding:32px 40px;text-align:center;max-width:420px;animation:wapop .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes wapop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.wa-icon{font-size:54px;margin-bottom:12px}
+.wa-title{font-size:26px;font-weight:700;color:var(--err-col);margin-bottom:8px;font-family:var(--font-head)}
+.wa-msg{font-size:18px;color:var(--text);line-height:1.6;margin-bottom:20px}
+.wa-close{padding:10px 28px;border:1px solid var(--err-bd);border-radius:50px;background:transparent;color:var(--err-col);font-family:var(--font-body);font-size:17px;cursor:pointer;transition:all .2s}
+.wa-close:hover{background:var(--err-bg)}
+
+/* ── SCORE ── */
+#s-score{align-items:center;justify-content:center;gap:18px;padding:36px 40px;text-align:center;min-height:540px}
+.sc-ttl{font-size:28px;font-weight:300;letter-spacing:4px;text-transform:uppercase;color:var(--muted)}
+.sc-ring{position:relative;width:190px;height:190px;flex-shrink:0}
+.sc-ring svg{transform:rotate(-90deg)}
+.sc-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.sc-num{font-size:61px;font-weight:900;font-family:var(--font-mono);background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.sc-grade{font-size:24px;font-weight:700;color:var(--warn-col)}
+.sc-msg{font-size:21px;color:var(--text);max-width:520px;line-height:1.6;font-weight:300}
+.sc-stats{display:flex;gap:32px}
+.sc-stat{display:flex;flex-direction:column;align-items:center;gap:4px}
+.sc-v{font-size:33px;font-weight:700;font-family:var(--font-mono);color:var(--accent)}
+.sc-l{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.badges{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;max-width:480px}
+.badge{padding:5px 13px;border-radius:50px;font-size:14px;font-weight:600;border:1px solid}
+.badge.ok{background:var(--badge-ok-bg);border-color:var(--badge-ok-bd);color:var(--badge-ok-col)}
+.badge.miss{background:var(--badge-miss-bg);border-color:var(--badge-miss-bd);color:var(--badge-miss-col)}
+.sc-cd{font-size:14px;color:var(--muted);font-family:var(--font-mono)}
+.sc-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.back-btn{padding:11px 28px;border:1px solid var(--border);border-radius:50px;background:transparent;color:var(--accent);font-family:var(--font-body);font-size:17px;cursor:pointer;transition:all .2s}
+.back-btn:hover{background:var(--ring-bg)}
+.hist-btn{padding:11px 28px;border:1px solid var(--ok-bd);border-radius:50px;background:transparent;color:var(--ok-col);font-family:var(--font-body);font-size:17px;cursor:pointer;transition:all .2s}
+.hist-btn:hover{background:var(--ok-bg)}
+
+/* ── HISTORY ── */
+#s-history{padding:24px;gap:16px;min-height:540px}
+.hist-hdr{display:flex;align-items:center;justify-content:space-between}
+.hist-title{font-size:24px;font-weight:700;color:var(--text);font-family:var(--font-head)}
+.clear-btn{padding:7px 16px;border:1px solid var(--err-bd);border-radius:8px;background:transparent;color:var(--err-col);font-family:var(--font-body);font-size:14px;cursor:pointer}
+.hist-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px}
+.hist-table-wrap{flex:1;overflow-y:auto;border-radius:var(--radius);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+thead{background:var(--surface);position:sticky;top:0}
+th{padding:12px 14px;text-align:left;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)}
+td{padding:11px 14px;border-bottom:1px solid var(--border2);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--ring-bg)}
+.grade-pill{display:inline-block;padding:3px 10px;border-radius:50px;font-size:13px;font-weight:700}
+.gA{background:var(--badge-ok-bg);color:var(--badge-ok-col);border:1px solid var(--badge-ok-bd)}
+.gB{background:var(--ring-bg);color:var(--accent);border:1px solid var(--border)}
+.gC{background:var(--warn-bg);color:var(--warn-col);border:1px solid var(--warn-bd)}
+.gD{background:var(--err-bg);color:var(--err-col);border:1px solid var(--err-bd)}
+.hist-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;flex-shrink:0}
+.sum-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.sum-val{font-size:28px;font-weight:700;font-family:var(--font-mono);color:var(--accent)}
+.sum-lbl{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:3px}
+
+/* ── LEADERBOARD ── */
+#s-leader{padding:24px;gap:16px;min-height:540px}
+.lead-hdr{display:flex;align-items:center;justify-content:space-between}
+.lead-title{font-size:24px;font-weight:700;color:var(--text);font-family:var(--font-head)}
+.lead-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:18px}
+.lead-list{display:flex;flex-direction:column;gap:10px;flex:1;overflow-y:auto}
+.lead-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;display:flex;align-items:center;gap:16px;transition:all .2s}
+.lead-item:hover{border-color:var(--accent)}
+.lead-rank{font-size:26px;font-weight:900;font-family:var(--font-mono);width:36px;text-align:center;color:var(--muted)}
+.lead-rank.gold{color:#ffd700}
+.lead-rank.silver{color:#c0c0c0}
+.lead-rank.bronze{color:#cd7f32}
+.lead-info{flex:1}
+.lead-name{font-size:18px;font-weight:600;color:var(--text)}
+.lead-date{font-size:13px;color:var(--muted);margin-top:2px}
+.lead-score{font-size:33px;font-weight:900;font-family:var(--font-mono);background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.lead-bar-wrap{width:120px;height:6px;background:rgba(128,128,128,.1);border-radius:3px;overflow:hidden}
+.lead-bar{height:100%;border-radius:3px;background:var(--grad90)}
+.top3-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;flex-shrink:0}
+.top3-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.top3-card.gold{border-color:rgba(255,215,0,0.4)}
+.top3-trophy{font-size:33px}
+.top3-score{font-size:35px;font-weight:900;font-family:var(--font-mono);background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.top3-name{font-size:15px;color:var(--text);font-weight:600}
+.top3-date{font-size:12px;color:var(--muted)}
+
+
+/* Twi subtitle bar */
+#subtitle-bar{
+  display:none;
+  background:rgba(0,0,0,0.75);
+  color:#fff;
+  font-size:18px;
+  line-height:1.5;
+  text-align:center;
+  padding:10px 20px;
+  position:absolute;
+  bottom:56px;
+  left:0;right:0;
+  z-index:15;
+  border-top:1px solid rgba(255,255,255,0.1);
+  font-style:italic;
+  letter-spacing:0.3px;
+}
+#subtitle-bar.show{display:block}
+
+/* ── Hamburger button ── */
+.hamburger{
+  display:flex;flex-direction:column;justify-content:center;
+  gap:5px;padding:10px 14px;cursor:pointer;
+  background:transparent;border:none;margin-left:auto;flex-shrink:0;
+}
+.hamburger span{
+  display:block;width:22px;height:2px;
+  background:var(--muted);border-radius:2px;
+  transition:all .3s ease;
+}
+.hamburger:hover span{ background:var(--text); }
+
+/* ── Settings overlay ── */
+.settings-overlay{
+  position:absolute;inset:0;z-index:50;
+  background:rgba(0,0,0,0.55);
+  display:none;align-items:flex-start;justify-content:flex-end;
+  border-radius:20px;
+}
+.settings-overlay.open{ display:flex; }
+
+/* ── Settings drawer ── */
+.settings-drawer{
+  width:300px;height:100%;
+  background:var(--app-bg);
+  border-left:1px solid var(--border);
+  border-radius:0 20px 20px 0;
+  display:flex;flex-direction:column;
+  animation:slideIn .25s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;
+}
+@keyframes slideIn{
+  from{transform:translateX(100%);opacity:0}
+  to{transform:translateX(0);opacity:1}
+}
+
+/* ── Drawer header ── */
+.drawer-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 14px;
+  border-bottom:1px solid var(--border2);
+  flex-shrink:0;
+}
+.drawer-title{
+  font-size:20px;font-weight:700;
+  color:var(--text);font-family:var(--font-head);
+  letter-spacing:-.3px;
+}
+.drawer-close{
+  background:transparent;border:none;cursor:pointer;
+  color:var(--muted);font-size:26px;line-height:1;
+  padding:2px 6px;border-radius:6px;transition:all .2s;
+}
+.drawer-close:hover{ background:var(--surface);color:var(--text); }
+
+/* ── Drawer sections ── */
+.drawer-section{
+  padding:18px 20px;
+  border-bottom:1px solid var(--border2);
+}
+.drawer-section:last-child{ border-bottom:none; }
+.section-title{
+  font-size:12px;font-weight:600;
+  letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--muted);margin-bottom:14px;
+}
+
+/* ── Theme swatches ── */
+.theme-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+}
+.theme-swatch{
+  border-radius:10px;padding:10px 12px;cursor:pointer;
+  border:2px solid transparent;
+  display:flex;align-items:center;gap:8px;
+  transition:all .2s;
+  background:var(--surface);
+}
+.theme-swatch:hover{ border-color:var(--border); }
+.theme-swatch.active{ border-color:var(--accent); }
+.swatch-dot{
+  width:14px;height:14px;border-radius:50%;flex-shrink:0;
+}
+.swatch-name{
+  font-size:14px;font-weight:600;color:var(--text);
+}
+
+/* ── Language pills ── */
+.lang-group{ display:flex;gap:8px;flex-wrap:wrap; }
+.lang-pill{
+  padding:7px 16px;border-radius:50px;
+  border:1px solid var(--border);background:transparent;
+  color:var(--muted);font-family:var(--font-body);
+  font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.lang-pill:hover{ border-color:var(--accent);color:var(--text); }
+.lang-pill.active{
+  background:var(--grad);border-color:transparent;color:#fff;
+}
+[data-theme="clinical"] .lang-pill.active,
+[data-theme="forest"] .lang-pill.active{ color:#0d1b2a; }
+
+/* ── Toggle rows ── */
+.toggle-row{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  padding:6px 0;
+}
+.toggle-label{ font-size:17px;color:var(--text); }
+.toggle-sub{ font-size:13px;color:var(--muted);margin-top:1px; }
+.toggle-switch{
+  position:relative;width:42px;height:24px;
+  background:var(--surface);border-radius:12px;
+  border:1px solid var(--border);cursor:pointer;
+  transition:background .2s;flex-shrink:0;
+}
+.toggle-switch.on{
+  background:var(--grad90);border-color:transparent;
+}
+.toggle-knob{
+  position:absolute;top:2px;left:2px;
+  width:18px;height:18px;border-radius:50%;
+  background:#fff;transition:transform .2s;
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.toggle-switch.on .toggle-knob{ transform:translateX(18px); }
+
+/* ── Speed slider ── */
+.speed-slider-row{ display:flex;flex-direction:column;gap:8px; }
+.slider-labels{
+  display:flex;justify-content:space-between;
+  font-size:13px;color:var(--muted);
+}
+
+/* ── About section ── */
+.about-logo{
+  font-size:26px;font-weight:900;
+  background:var(--grad);-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;
+  font-family:var(--font-head);margin-bottom:8px;
+}
+.about-line{ font-size:14px;color:var(--muted);line-height:1.8; }
+.who-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:10px;padding:5px 12px;
+  border-radius:50px;border:1px solid var(--ok-bd);
+  background:var(--ok-bg);
+  font-size:13px;font-weight:600;color:var(--ok-col);
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+</head>
+<body>
+<div id="app" data-theme="cyber">
+
+<div class="flash green-f" id="flash-green"></div>
+<div class="flash red-f"   id="flash-red"></div>
+<div class="wrong-alert"   id="wrong-alert">
+  <div class="wa-box">
+    <div class="wa-icon">&#9888;&#65039;</div>
+    <div class="wa-title">Wrong Step Detected!</div>
+    <div class="wa-msg" id="wa-msg">Please follow the steps in order.</div>
+    <button class="wa-close" onclick="closeWrongAlert()">Got it &mdash; I&apos;ll retry</button>
+  </div>
+</div>
+
+<!-- nav -->
+<div class="nav">
+  <button class="nav-btn active" onclick="navTo('idle')"    id="nav-idle">Home</button>
+  <button class="nav-btn"        onclick="navTo('history')" id="nav-history">Session History</button>
+  <button class="nav-btn"        onclick="navTo('leader')"  id="nav-leader">Leaderboard</button>
+  <button class="hamburger" onclick="openSettings()" aria-label="Settings">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<!-- Settings overlay -->
+<div class="settings-overlay" id="settings-overlay" onclick="overlayClick(event)">
+  <div class="settings-drawer" id="settings-drawer">
+    <div class="drawer-hdr">
+      <div class="drawer-title">Settings</div>
+      <button class="drawer-close" onclick="closeSettings()">&#10005;</button>
+    </div>
+
+    <!-- Theme -->
+    <div class="drawer-section">
+      <div class="section-title">Theme</div>
+      <div class="theme-grid">
+        <div class="theme-swatch active" id="sw-cyber"    onclick="setTheme('cyber',this)">
+          <div class="swatch-dot" style="background:linear-gradient(135deg,#00b4ff,#00e5a0)"></div>
+          <span class="swatch-name">Cyber Blue</span>
+        </div>
+        <div class="theme-swatch" id="sw-clinical" onclick="setTheme('clinical',this)">
+          <div class="swatch-dot" style="background:linear-gradient(135deg,#0071e3,#00a86b)"></div>
+          <span class="swatch-name">Clinical White</span>
+        </div>
+        <div class="theme-swatch" id="sw-sunset"   onclick="setTheme('sunset',this)">
+          <div class="swatch-dot" style="background:linear-gradient(135deg,#ff8c00,#ff3d71)"></div>
+          <span class="swatch-name">Sunset Warm</span>
+        </div>
+        <div class="theme-swatch" id="sw-forest"   onclick="setTheme('forest',this)">
+          <div class="swatch-dot" style="background:linear-gradient(135deg,#00d478,#7dff6b)"></div>
+          <span class="swatch-name">Forest Green</span>
+        </div>
+        <div class="theme-swatch" id="sw-royal"    onclick="setTheme('royal',this)">
+          <div class="swatch-dot" style="background:linear-gradient(135deg,#a064ff,#ff64d8)"></div>
+          <span class="swatch-name">Royal Purple</span>
+        </div>
+        <div class="theme-swatch" id="sw-white"    onclick="setTheme('white',this)">
+          <div class="swatch-dot" style="background:linear-gradient(135deg,#1d7afc,#30b47e);border:1px solid #ddd"></div>
+          <span class="swatch-name">Pure White</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Language -->
+    <div class="drawer-section">
+      <div class="section-title">Language</div>
+      <div class="lang-group">
+        <button class="lang-pill active" id="lp-en" onclick="changeLang('en',this)">English</button>
+        <button class="lang-pill"        id="lp-fr" onclick="changeLang('fr',this)">Fran&#231;ais</button>
+        <button class="lang-pill"        id="lp-tw" onclick="changeLang('tw',this)">Asante Twi</button>
+      </div>
+    </div>
+
+    <!-- Audio -->
+    <div class="drawer-section">
+      <div class="section-title">Audio</div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Voice feedback</div>
+          <div class="toggle-sub">Spoken instructions during session</div></div>
+        <div class="toggle-switch on" id="audio-sw" onclick="toggleAudio()">
+          <div class="toggle-knob"></div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div style="font-size:15px;color:var(--text);margin-bottom:8px">Speech rate</div>
+        <div class="speed-slider-row">
+          <input type="range" id="rate-slider" min="0.6" max="1.4" step="0.1" value="0.95"
+                 oninput="SPEECH.rate=parseFloat(this.value);updateRateLabel()"/>
+          <div class="slider-labels"><span>Slow</span><span id="rate-lbl">Normal</span><span>Fast</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Demo speed -->
+    <div class="drawer-section">
+      <div class="section-title">Demo simulation speed</div>
+      <div class="speed-slider-row">
+        <input type="range" id="demo-speed" min="35" max="200" step="5" value="130"
+               oninput="TICK=parseInt(this.value);updateDemoSpeedLabel()"/>
+        <div class="slider-labels"><span>Very fast</span><span id="dspeed-lbl">Normal</span><span>Slow</span></div>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="drawer-section">
+      <div class="section-title">About</div>
+      <div class="about-logo">WASH-IT</div>
+      <div class="about-line">WHO Handwash Compliance Monitor</div>
+      <div class="about-line">Version 1.0 &nbsp;&middot;&nbsp; Built for clinical deployment</div>
+      <div class="about-line">Raspberry Pi 4B &nbsp;&middot;&nbsp; TCN-Attention Model</div>
+      <div class="who-badge">&#10003; WHO 7-Step Protocol Compliant</div>
+    </div>
+  </div>
+</div>
+
+<!-- IDLE -->
+<div class="scr on" id="s-idle">
+  <div>
+    <div class="idle-title">WASH-IT</div>
+    <div class="idle-sub">WHO Handwash Compliance Monitor</div>
+  </div>
+  <div class="idle-prompt">&#9679;&nbsp; Approach the sensor to begin</div>
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <button class="demo-btn" onclick="triggerSession()">&#9658;&nbsp; Start Handwashing Session</button>
+
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:4px;padding-top:16px;border-top:1px solid var(--border2);width:100%;max-width:380px">
+    <div style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">Live Camera Mode</div>
+    <input id="live-server-addr" type="text" placeholder="ws://192.168.1.50:8000/ws"
+      style="width:100%;padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--font-mono);font-size:14px;text-align:center"
+      value="ws://localhost:8000/ws">
+    <button class="demo-btn" style="background:var(--surface);color:var(--accent);border:1px solid var(--border);padding:10px 28px;font-size:17px"
+      onclick="connectLiveBackend(document.getElementById('live-server-addr').value)">
+      &#128247;&nbsp; Connect to Pi Camera
+    </button>
+  </div>
+</div>
+
+<!-- SESSION -->
+<div class="scr" id="s-session">
+  <div class="s-hdr">
+    <div class="s-logo">WASH-IT</div>
+    <div class="s-timer" id="timer">00:00</div>
+    <div class="s-live"><div class="live-dot"></div>MONITORING</div>
+  </div>
+  <div class="s-body">
+    <div class="left-p">
+      <div class="top-row cam-hidden">
+        <div class="cam-card" id="cam-card" style="display:none">
+          <div class="card-lbl">Live Camera</div>
+          <div class="cam-wrap">
+            <img id="cam-feed" alt="Live camera feed" style="border-radius:12px;display:block">
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-lbl">Current Step</div>
+          <div class="step-num-bg" id="snb">1</div>
+          <div class="step-name" id="sname">Palm to Palm</div>
+          <div class="diag-area" id="diagarea"></div>
+        </div>
+      </div>
+      <div class="fb-banner" id="fbb">
+        <div class="fb-ico" id="fbico">&#128064;</div>
+        <div class="fb-txt" id="fbtxt">Watching for <b>Step 1 &mdash; Palm to Palm</b></div>
+      </div>
+    </div>
+    <div class="right-p">
+      <div class="meter-card">
+        <div class="meter-lbl">Compliance</div>
+        <div class="meter-wrap">
+          <svg viewBox="0 0 110 110" width="110" height="110">
+            <defs><linearGradient id="mg" x1="0" y1="0" x2="1" y2="0"><stop id="mg1" offset="0%" stop-color="#00b4ff"/><stop id="mg2" offset="100%" stop-color="#00e5a0"/></linearGradient></defs>
+            <circle cx="55" cy="55" r="46" fill="none" stroke="rgba(128,128,128,0.1)" stroke-width="9"/>
+            <circle id="meter-arc" cx="55" cy="55" r="46" fill="none" stroke="url(#mg)" stroke-width="9" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="289" style="transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1)"/>
+          </svg>
+          <div class="meter-inner"><div class="meter-pct" id="meter-pct">0%</div><div class="meter-sub">DONE</div></div>
+        </div>
+        <div class="step-counter"><span id="sc-done">0</span>/7 steps</div>
+      </div>
+      <div class="conf-card">
+        <div class="card-lbl">Detection Confidence</div>
+        <div class="conf-wrap"><div class="conf-fill" id="cbar"></div></div>
+        <div class="conf-val" id="cval">&mdash;</div>
+        <div class="det-lbl">Detecting: <span id="dname">&mdash;</span></div>
+      </div>
+      <div class="steps-card">
+        <div class="steps-ttl">WHO 7-Step Checklist</div>
+        <div id="slist"></div>
+      </div>
+    </div>
+  </div>
+  <div class="manual-row">
+    <div class="man-lbl">Manual:</div>
+    <button class="man-btn"       onclick="manComplete()">&#10003; Complete step</button>
+    <button class="man-btn amber" onclick="manWrong()">&#9888; Corrective msg</button>
+    <button class="man-btn red"   onclick="manWrongStep()">&#10007; Wrong step alert</button>
+    <button class="man-btn"       onclick="manSkip()">&#9197; Skip step</button>
+    <button class="man-btn"       onclick="manFinish()">&#9193; Jump to score</button>
+    <button class="man-btn red"   onclick="resetDemoWithLiveSupport()">&#10007; End</button>
+  </div>
+</div>
+
+<!-- SCORE -->
+<div class="scr" id="s-score">
+  <svg style="width:0;height:0;position:absolute"><defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="0"><stop id="sg1" offset="0%" stop-color="#00b4ff"/><stop id="sg2" offset="100%" stop-color="#00e5a0"/></linearGradient></defs></svg>
+  <div class="sc-ttl">Session Complete</div>
+  <div class="sc-ring">
+    <svg viewBox="0 0 190 190" width="190" height="190">
+      <circle cx="95" cy="95" r="82" fill="none" stroke="rgba(128,128,128,0.06)" stroke-width="11"/>
+      <circle id="sarc" cx="95" cy="95" r="82" fill="none" stroke="url(#sg)" stroke-width="11" stroke-linecap="round" stroke-dasharray="515" stroke-dashoffset="515" style="transition:stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1)"/>
+    </svg>
+    <div class="sc-inner"><div class="sc-num" id="scnum">0</div><div class="sc-grade" id="scgrade">&mdash;</div></div>
+  </div>
+  <div class="sc-msg" id="scmsg">Calculating...</div>
+  <div class="sc-stats">
+    <div class="sc-stat"><div class="sc-v" id="st-steps">0/7</div><div class="sc-l">Steps done</div></div>
+    <div class="sc-stat"><div class="sc-v" id="st-time">0s</div><div class="sc-l">Duration</div></div>
+    <div class="sc-stat"><div class="sc-v" id="st-order">&mdash;</div><div class="sc-l">Order</div></div>
+  </div>
+  <div class="badges" id="scbadges"></div>
+  <div class="sc-cd" id="sccd">Returning to home in 12s...</div>
+  <div class="sc-btns">
+    <button class="back-btn" onclick="resetDemoWithLiveSupport()">&#8617; Home</button>
+    <button class="hist-btn" onclick="navTo('history')">&#128203; View History</button>
+    <button class="hist-btn" style="border-color:var(--warn-bd);color:var(--warn-col)" onclick="navTo('leader')">Leaderboard</button>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="scr" id="s-history">
+  <div class="hist-hdr"><div class="hist-title">Session History</div><button class="clear-btn" onclick="clearHistory()">Clear all</button></div>
+  <div class="hist-summary" id="hist-summary"></div>
+  <div class="hist-table-wrap" id="hist-table-wrap">
+    <div class="hist-empty" id="hist-empty">No sessions yet. Run a demo first.</div>
+    <table id="hist-table" style="display:none">
+      <thead><tr><th>#</th><th>Time &amp; Date</th><th>Steps</th><th>Duration</th><th>Score</th><th>Grade</th><th>Order</th></tr></thead>
+      <tbody id="hist-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- LEADERBOARD -->
+<div class="scr" id="s-leader">
+  <div class="lead-hdr"><div class="lead-title">&#127942; Top Compliance Scores</div><button class="clear-btn" onclick="clearLeader()">Clear</button></div>
+  <div class="top3-row" id="top3-row"></div>
+  <div class="lead-list" id="lead-list"><div class="lead-empty" id="lead-empty">No sessions yet. Run a demo first.</div></div>
+</div>
+
+
+<div id="subtitle-bar"></div>
+</div>
+
+<script>
+/* ── Settings panel ── */
+function openSettings(){ document.getElementById('settings-overlay').classList.add('open'); }
+function closeSettings(){ document.getElementById('settings-overlay').classList.remove('open'); }
+function overlayClick(e){
+  if(e.target===document.getElementById('settings-overlay')) closeSettings();
+}
+function changeLang(code, btn){
+  CURRENT_LANG=code;
+  document.querySelectorAll('.lang-pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  SPEECH.stop(); SPEECH.say(L().audioOn, true);
+  showSubtitle(L().welcome);
+  var sname=document.getElementById('sname');
+  if(sname && cur<7){
+    sname.textContent=L().stepNames[cur];
+    document.getElementById('fbtxt').innerHTML=
+      'Watching for <b>Step '+(cur+1)+' — '+L().stepNames[cur]+'</b>';
+  }
+  if(!L().twi_mode){
+    var bar=document.getElementById('subtitle-bar');
+    if(bar) bar.classList.remove('show');
+  }
+}
+function toggleAudio(){
+  var sw=document.getElementById('audio-sw');
+  SPEECH.enabled=!SPEECH.enabled;
+  sw.classList.toggle('on', SPEECH.enabled);
+  if(SPEECH.enabled) SPEECH.say(L().audioOn, true);
+  else SPEECH.stop();
+}
+function updateRateLabel(){
+  var v=parseFloat(document.getElementById('rate-slider').value);
+  var lbl=v<0.8?'Slow':v>1.1?'Fast':'Normal';
+  document.getElementById('rate-lbl').textContent=lbl;
+}
+function updateDemoSpeedLabel(){
+  var v=parseInt(document.getElementById('demo-speed').value);
+  TICK=v;
+  var lbl=v<60?'Very fast':v<100?'Fast':v<160?'Normal':'Slow';
+  document.getElementById('dspeed-lbl').textContent=lbl;
+}
+
+const DIAGRAMS=[
+  `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:100%"><img src="assets/demo_step_1.gif" style="max-height:160px;max-width:100%;object-fit:contain;border-radius:10px;border:1px solid rgba(0,180,255,0.2)" alt="Step 1"/><span style="font-size:13px;color:var(--muted)">Rub palms together in circular motion</span></div>`,
+  `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:100%"><img src="assets/demo_step_2.gif" style="max-height:160px;max-width:100%;object-fit:contain;border-radius:10px;border:1px solid rgba(0,180,255,0.2)" alt="Step 2"/><span style="font-size:13px;color:var(--muted)">Right palm over left hand dorsum</span></div>`,
+  `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:100%"><img src="assets/demo_step_3.gif" style="max-height:160px;max-width:100%;object-fit:contain;border-radius:10px;border:1px solid rgba(0,180,255,0.2)" alt="Step 3"/><span style="font-size:13px;color:var(--muted)">Palm to palm with fingers interlaced</span></div>`,
+  `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:100%"><img src="assets/demo_step_4.gif" style="max-height:160px;max-width:100%;object-fit:contain;border-radius:10px;border:1px solid rgba(0,180,255,0.2)" alt="Step 4"/><span style="font-size:13px;color:var(--muted)">Backs of fingers against opposing palms</span></div>`,
+  `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:100%"><img src="assets/demo_step_5.gif" style="max-height:160px;max-width:100%;object-fit:contain;border-radius:10px;border:1px solid rgba(0,180,255,0.2)" alt="Step 5"/><span style="font-size:13px;color:var(--muted)">Rotational rubbing of left thumb in right palm</span></div>`,
+  `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:100%"><img src="assets/demo_step_6.gif" style="max-height:160px;max-width:100%;object-fit:contain;border-radius:10px;border:1px solid rgba(0,180,255,0.2)" alt="Step 6"/><span style="font-size:13px;color:var(--muted)">Fingertips rotating backwards and forwards in palm</span></div>`,
+  `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:100%"><img src="assets/demo_step_7.gif" style="max-height:160px;max-width:100%;object-fit:contain;border-radius:10px;border:1px solid rgba(0,180,255,0.2)" alt="Step 7"/><span style="font-size:13px;color:var(--muted)">Rotate wrist in opposite palm</span></div>`
+];
+
+const STEPS=[
+  {name:"Palm to Palm",       correct:"Great! Palms thoroughly rubbed.",            corrective:"Rub your palms together firmly in circular motions."},
+  {name:"Back of Hands",      correct:"Perfect! Both hand backs covered.",           corrective:"Place right palm over the back of your left hand, fingers spread."},
+  {name:"Interlaced Fingers", correct:"Excellent! Between all fingers cleaned.",     corrective:"Interlock your fingers and scrub between them thoroughly."},
+  {name:"Backs of Fingers",   correct:"Well done! Knuckles thoroughly cleaned.",    corrective:"Fold your fingers and rub their backs firmly against your palm."},
+  {name:"Thumb Rotation",     correct:"Both thumbs cleaned!",                       corrective:"Clasp your thumb tightly and rotate it inside your other hand."},
+  {name:"Fingertip Scrub",    correct:"Fingertips clean!",                          corrective:"Press your fingertips into your opposite palm and rotate in circles."},
+  {name:"Wrist Wash",         correct:"All 7 steps complete — hands are clean!",    corrective:"Grip your wrist and rotate your hand to clean the wrist area."},
+];
+const WRONG_MSGS=["Step 1 (Palm to Palm) must be done first. Start by rubbing your palms together.","Step 2 (Back of Hands) comes after Step 1. Place right palm over left dorsum.","Step 3 (Interlaced Fingers) comes next. Interlock fingers and scrub between them.","Step 4 (Backs of Fingers) should follow Step 3. Rub knuckles against opposing palm.","Step 5 (Thumb Rotation) is next. Clasp and rotate each thumb.","Step 6 (Fingertip Scrub) comes before Step 7. Rotate fingertips in your palm.","Step 7 (Wrist Wash) is the final step. Rotate wrist in opposite palm."];
+const GRADE_MSG={'A+':"Perfect technique! All 7 WHO steps completed correctly. Your hands are thoroughly clean.",'A':"Excellent work! Nearly flawless handwashing technique.",'B':"Good job! You completed most steps. Aim for all 7 next time.",'C':"Decent effort. Complete every step in order for full protection.",'D':"Keep practising. Follow all 7 WHO steps carefully next time."};
+
+/* theme accent colors per theme for SVG gradients */
+const THEME_COLORS={
+  cyber:    ['#00b4ff','#00e5a0'],
+  clinical: ['#0071e3','#00a86b'],
+  sunset:   ['#ff8c00','#ff3d71'],
+  forest:   ['#00d478','#7dff6b'],
+  royal:    ['#a064ff','#ff64d8'],
+  white:    ['#1d7afc','#30b47e'],
+};
+
+function setTheme(name, btn){
+  document.getElementById('app').setAttribute('data-theme', name);
+  document.querySelectorAll('.theme-swatch').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  var sw=document.getElementById('sw-'+name);
+  if(sw) sw.classList.add('active');
+  // update SVG gradients to match theme
+  const [c1,c2]=THEME_COLORS[name]||THEME_COLORS.cyber;
+  document.getElementById('mg1').setAttribute('stop-color',c1);
+  document.getElementById('mg2').setAttribute('stop-color',c2);
+  document.getElementById('sg1').setAttribute('stop-color',c1);
+  document.getElementById('sg2').setAttribute('stop-color',c2);
+}
+
+
+/* ═══════════════════════════════════════════
+   MULTILINGUAL AUDIO ENGINE
+═══════════════════════════════════════════ */
+
+/* All UI text per language.
+   Add more languages by adding a new key below. */
+const LANG_DATA = {
+  'en': {
+    label:    'English',
+    langCode: 'en-GB',
+    flag:     'EN',
+    twi_mode: false,
+    welcome:      'Welcome to WASH-IT. Please begin handwashing. Follow the steps shown on screen.',
+    stepIntro:    function(n,name,instr){ return 'Step '+n+'. '+name+'. '+instr; },
+    stepDone:     function(name,msg){ return name+' complete. '+msg; },
+    corrective:   function(msg){ return msg; },
+    wrongAlert:   function(msg){ return 'Wrong step detected! '+msg; },
+    at20s:        '20 seconds. Good progress, keep going.',
+    at40s:        '40 seconds. WHO recommends 40 to 60 seconds. Almost done.',
+    at60s:        '60 seconds reached. Excellent thoroughness.',
+    scoreMsg:     function(score,grade,msg){ return 'Session complete. Your compliance score is '+score+' out of 100. Grade '+grade+'. '+msg; },
+    audioOn:      'Audio enabled.',
+    steps: [
+      'Rub your palms together firmly in circular motions.',
+      'Place right palm over the back of your left hand, fingers spread.',
+      'Interlock your fingers and scrub between them thoroughly.',
+      'Fold your fingers and rub their backs firmly against your palm.',
+      'Clasp your thumb tightly and rotate it inside your other hand.',
+      'Press your fingertips into your opposite palm and rotate in circles.',
+      'Grip your wrist and rotate your hand to clean the wrist area.'
+    ],
+    stepNames: ['Palm to Palm','Back of Hands','Interlaced Fingers','Backs of Fingers','Thumb Rotation','Fingertip Scrub','Wrist Wash'],
+    gradeMsg: {
+      'A+': 'Perfect technique! All 7 WHO steps completed correctly.',
+      'A':  'Excellent work! Nearly flawless handwashing.',
+      'B':  'Good job! You completed most steps.',
+      'C':  'Decent effort. Complete every step next time.',
+      'D':  'Keep practising. Follow all 7 steps carefully.'
+    }
+  },
+
+  'fr': {
+    label:    'Français',
+    langCode: 'fr-FR',
+    flag:     'FR',
+    twi_mode: false,
+    welcome:      'Bienvenue sur WASH-IT. Veuillez commencer le lavage des mains. Suivez les étapes affichées à l\'écran.',
+    stepIntro:    function(n,name,instr){ return 'Étape '+n+'. '+name+'. '+instr; },
+    stepDone:     function(name,msg){ return name+' terminé. '+msg; },
+    corrective:   function(msg){ return msg; },
+    wrongAlert:   function(msg){ return 'Mauvaise étape détectée! '+msg; },
+    at20s:        '20 secondes. Bonne progression, continuez.',
+    at40s:        '40 secondes. L\'OMS recommande 40 à 60 secondes. Presque terminé.',
+    at60s:        '60 secondes atteintes. Excellente rigueur.',
+    scoreMsg:     function(score,grade,msg){ return 'Session terminée. Votre score de conformité est '+score+' sur 100. Note '+grade+'. '+msg; },
+    audioOn:      'Audio activé.',
+    steps: [
+      'Frottez vos paumes ensemble en mouvements circulaires.',
+      'Placez la paume droite sur le dos de la main gauche, doigts écartés.',
+      'Entrecroisez les doigts et frottez entre eux soigneusement.',
+      'Pliez les doigts et frottez leurs dos contre la paume opposée.',
+      'Serrez votre pouce et faites-le tourner dans votre autre main.',
+      'Pressez le bout des doigts sur la paume opposée et tournez en cercles.',
+      'Saisissez votre poignet et faites tourner votre main pour le nettoyer.'
+    ],
+    stepNames: ['Paume à Paume','Dos des Mains','Doigts Entrelacés','Dos des Doigts','Rotation du Pouce','Nettoyage des Bouts','Poignet'],
+    gradeMsg: {
+      'A+': 'Technique parfaite! Les 7 étapes complètes.',
+      'A':  'Excellent travail! Lavage presque parfait.',
+      'B':  'Bon travail! Essayez de compléter les 7 étapes.',
+      'C':  'Effort correct. Complétez toutes les étapes la prochaine fois.',
+      'D':  'Continuez à pratiquer. Suivez soigneusement les 7 étapes.'
+    }
+  },
+
+  'tw': {
+    label:    'Asante Twi',
+    langCode: 'en-GB',
+    flag:     'TW',
+    twi_mode: true,
+    welcome:      'Akwaaba WASH-IT mu. Mesrɛ wo, hwehwɛ wo nsa. Di nkyinkyim a wohunu wɔ screen no so.',
+    stepIntro:    function(n,name,instr){ return 'Nkyinkyim '+n+'. '+name+'. '+instr; },
+    stepDone:     function(name,msg){ return name+' wie. '+msg; },
+    corrective:   function(msg){ return msg; },
+    wrongAlert:   function(msg){ return 'Nkyinkyim foforo a enye! '+msg; },
+    at20s:        'Sɛkɛnd aduonu. Kɔ so yie.',
+    at40s:        'Sɛkɛnd aduanan. WHO ka sɛ sɛkɛnd aduanan nsi aduosia. Bɛwie ntɛm.',
+    at60s:        'Sɛkɛnd aduosia. Wo ayɛ ade papa paa.',
+    scoreMsg:     function(score,grade,msg){ return 'Nkyinkyim wie. Wo score ne '+score+' wɔ 100 mu. Degrii '+grade+'. '+msg; },
+    audioOn:      'Asɛm no hyɛ mu.',
+    steps: [
+      'Bɔ wo nsa tumi ano ano na yi ho yie.',
+      'De wo nsa nifa tumi to wo benkum nsa akyi so.',
+      'Fa wo nsa nsateaa hyia hyia na yi ho yie.',
+      'Bɔ wo nsateaa akyi wɔ wo nsa foforɔ ano so.',
+      'De wo nsa bɔ kookoo na yi ho yie.',
+      'Hwie wo nsateaa ano wɔ wo nsa foforɔ ano so na twitwi ho.',
+      'De wo nsa kyekyere wo nsa ano na twitwi ho.'
+    ],
+    stepNames: ['Ano to Ano','Nsa Akyi','Nsateaa Hyia','Nsateaa Akyi','Kookoo Twitwi','Nsateaa Ano','Nsa Ano'],
+    gradeMsg: {
+      'A+': 'Wo ayɛ yie paa! Nkyinkyim nson nyinaa wie.',
+      'A':  'Wo ayɛ ade pa. Nkyinkyim bɛyɛ papa.',
+      'B':  'Yɛ! Hwehwɛ sɛ wo wie nkyinkyim nson nyinaa.',
+      'C':  'Yɛ bio na wie nkyinkyim nyinaa.',
+      'D':  'Sɔ so yɛ. Di nkyinkyim nson no nyinaa.'
+    }
+  }
+};
+
+/* Current language key */
+var CURRENT_LANG = 'en';
+function L() { return LANG_DATA[CURRENT_LANG]; }
+
+const SPEECH = {
+  enabled: true,
+  rate:    0.95,
+  pitch:   1.0,
+  volume:  1.0,
+
+  say: function(text, priority) {
+    if (!this.enabled) return;
+    if (!window.speechSynthesis) return;
+    if (priority) window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate   = this.rate;
+    u.pitch  = this.pitch;
+    u.volume = this.volume;
+    u.lang   = L().langCode;
+    var voices = window.speechSynthesis.getVoices();
+    var lc = L().langCode;
+    var preferred = voices.find(function(v){ return v.lang === lc; })
+                 || voices.find(function(v){ return v.lang.startsWith(lc); })
+                 || null;
+    if (preferred) u.voice = preferred;
+    window.speechSynthesis.speak(u);
+  },
+
+  stop: function() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+  }
+};
+
+
+/* Subtitle helper for Twi mode */
+function showSubtitle(text) {
+  var bar = document.getElementById('subtitle-bar');
+  if (!bar) return;
+  if (L().twi_mode) {
+    bar.textContent = text;
+    bar.classList.add('show');
+    clearTimeout(showSubtitle._timer);
+    showSubtitle._timer = setTimeout(function(){ bar.classList.remove('show'); }, 5000);
+  } else {
+    bar.classList.remove('show');
+  }
+}
+showSubtitle._timer = null;
+
+/* Preload voices */
+if (window.speechSynthesis) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
+}
+
+
+/* Settings panel handles language + audio toggle */
+
+
+/* Voice countdown timer — announces time every 10s */
+var countdownAnnounced = {};
+function checkVoiceCountdown(elapsed) {
+  var milestones = [10, 20, 30, 40, 60];
+  milestones.forEach(function(m) {
+    if (elapsed === m && !countdownAnnounced[m]) {
+      countdownAnnounced[m] = true;
+      if (m === 20) { SPEECH.say(L().at20s, false); showSubtitle(L().at20s); }
+      else if (m === 40) { SPEECH.say(L().at40s, false); showSubtitle(L().at40s); }
+      else if (m === 60) { SPEECH.say(L().at60s, false); showSubtitle(L().at60s); }
+    }
+  });
+}
+
+let cur=0,done=new Set(),simInt=null,timerInt=null,cdInt=null;
+let sessionStart=0,TICK=130,simPhase=0,confRamp=0,phaseStep=0;
+let history=JSON.parse(localStorage.getItem('washit_history')||'[]');
+
+function showScreen(id){
+  document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  var scr=document.getElementById('s-'+id);
+  if(scr) scr.classList.add('on');
+  var nb=document.getElementById('nav-'+id);
+  if(nb) nb.classList.add('active');
+}
+function navTo(id){
+  // Block manual nav away from the live session view while a real
+  // PIR/session-tracked session is active -- an accidental tap here
+  // (easy on a touchscreen near a sink) used to desync the visible
+  // screen from __sessionEntered without the code ever knowing.
+  if (typeof __sessionEntered !== 'undefined' && __sessionEntered && id !== 'session') {
+    console.log('[WASH-IT] nav blocked during active session:', id);
+    return;
+  }
+  showScreen(id);
+  if(id==='history') renderHistory();
+  if(id==='leader')  renderLeader();
+}
+
+function buildList(){
+  var el=document.getElementById('slist');
+  el.innerHTML='';
+  STEPS.forEach(function(s,i){
+    var d=document.createElement('div');
+    d.className='si'+(i===0?' cur':'');
+    d.id='si'+i;
+    d.innerHTML='<div class="si-chk">'+(i+1)+'</div><div class="si-name">'+s.name+'</div>';
+    el.appendChild(d);
+  });
+}
+function syncList(){
+  document.querySelectorAll('.si').forEach(function(el,i){
+    el.className='si'+(done.has(i)?' done':i===cur?' cur':'');
+  });
+}
+function setStep(i){
+  document.getElementById('snb').textContent=i+1;
+  document.getElementById('sname').textContent=L().stepNames ? L().stepNames[i] : STEPS[i].name;
+  document.getElementById('diagarea').innerHTML=DIAGRAMS[i];
+  var fb=document.getElementById('fbb');
+  fb.className='fb-banner';
+  document.getElementById('fbico').textContent='\uD83D\uDC40';
+  document.getElementById('fbtxt').innerHTML='Watching for <b>Step '+(i+1)+' \u2014 '+(L().stepNames ? L().stepNames[i] : STEPS[i].name)+'</b>';
+  syncList();
+}
+function updateMeter(){
+  var n=done.size, pct=Math.round((n/7)*100), offset=289*(1-n/7);
+  document.getElementById('meter-arc').style.strokeDashoffset=offset;
+  document.getElementById('meter-pct').textContent=pct+'%';
+  document.getElementById('sc-done').textContent=n;
+}
+function updateConf(pct,name){
+  document.getElementById('cbar').style.width=pct+'%';
+  document.getElementById('cval').textContent=pct+'%';
+  document.getElementById('dname').textContent=name;
+}
+function doFlash(type){
+  var el=document.getElementById('flash-'+type);
+  el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show');},320);
+}
+function completeStep(i){
+  done.add(i); updateMeter();
+  var fb=document.getElementById('fbb');
+  fb.className='fb-banner ok';
+  document.getElementById('fbico').textContent='\u2705';
+  document.getElementById('fbtxt').innerHTML='<b>'+STEPS[i].name+'</b> \u2014 '+STEPS[i].correct;
+  syncList(); doFlash('green');
+  SPEECH.say(L().stepDone(L().stepNames[i], L().steps[i]), true);
+  showSubtitle(L().stepDone(L().stepNames[i], L().steps[i]));
+  if(i<6){
+    setTimeout(function(){
+      cur=i+1; confRamp=0; simPhase=0; phaseStep=0; setStep(cur);
+      setTimeout(function(){
+        SPEECH.say(L().stepIntro(cur+1, L().stepNames[cur], L().steps[cur]), false);
+        showSubtitle(L().stepIntro(cur+1, L().stepNames[cur], L().steps[cur]));
+      },800);
+    },900);
+  } else { clearInterval(simInt); setTimeout(function(){showScore();},1200); }
+}
+function startTimer(){
+  sessionStart=Date.now();
+  if(timerInt) clearInterval(timerInt);
+  timerInt=setInterval(function(){
+    var e=Math.floor((Date.now()-sessionStart)/1000);
+    var m=String(Math.floor(e/60)).padStart(2,'0'), s=String(e%60).padStart(2,'0');
+    document.getElementById('timer').textContent=m+':'+s;
+    checkVoiceCountdown(e);
+  },1000);
+}
+function startSim(){
+  if(simInt) clearInterval(simInt);
+  simPhase=0; confRamp=0; phaseStep=0;
+  simInt=setInterval(function(){
+    var name=STEPS[cur].name;
+    if(simPhase===0){
+      confRamp=Math.min(confRamp+3+Math.random()*3,48+Math.random()*16);
+      updateConf(Math.round(confRamp),name);
+      if(confRamp>38){
+        var fb=document.getElementById('fbb');
+        fb.className='fb-banner warn';
+        document.getElementById('fbico').textContent='\u26A0\uFE0F';
+        document.getElementById('fbtxt').textContent=STEPS[cur].corrective;
+      }
+      if(confRamp>=62) simPhase=1;
+    } else if(simPhase===1){
+      confRamp=Math.min(confRamp+2,80+Math.random()*14);
+      updateConf(Math.round(confRamp),name);
+      phaseStep++;
+      if(phaseStep>10){ simPhase=2; completeStep(cur); }
+    }
+  },TICK);
+}
+function startDemo(){
+  cur=0; done=new Set(); countdownAnnounced={};
+  buildList(); setStep(0); updateMeter();
+  showScreen('session');
+  SPEECH.say(L().welcome, true);
+    showSubtitle(L().welcome);
+  startTimer(); startSim();
+}
+function manComplete(){
+  if(done.has(cur)) return;
+  clearInterval(simInt); updateConf(91,STEPS[cur].name);
+  completeStep(cur); if(cur<6) setTimeout(startSim,1000);
+}
+function manWrong(){
+  var fb=document.getElementById('fbb');
+  fb.className='fb-banner warn';
+  document.getElementById('fbico').textContent='\u26A0\uFE0F';
+  document.getElementById('fbtxt').textContent=STEPS[cur].corrective;
+  updateConf(38,STEPS[cur].name);
+  SPEECH.say(L().corrective(L().steps[cur]), false);
+  showSubtitle(L().steps[cur]);
+}
+function manWrongStep(){
+  doFlash('red');
+  document.getElementById('wa-msg').textContent=WRONG_MSGS[cur];
+  document.getElementById('wrong-alert').classList.add('show');
+  clearInterval(simInt);
+  SPEECH.say(L().wrongAlert(L().steps[cur]), true);
+  showSubtitle(L().wrongAlert(L().steps[cur]));
+}
+function closeWrongAlert(){
+  document.getElementById('wrong-alert').classList.remove('show');
+  startSim();
+}
+function manSkip(){
+  if(cur>=6) return;
+  clearInterval(simInt); done.add(cur); cur++;
+  confRamp=0; simPhase=0; phaseStep=0;
+  updateMeter(); setStep(cur); setTimeout(startSim,300);
+}
+function manFinish(){
+  clearInterval(simInt);
+  for(var i=cur;i<7;i++) done.add(i);
+  cur=6; updateMeter(); syncList();
+  updateConf(93,STEPS[6].name);
+  setTimeout(showScore,600);
+}
+function showScore(){
+  clearInterval(timerInt);
+  var elapsed=Math.floor((Date.now()-sessionStart)/1000);
+  var n=done.size;
+  var score=Math.min(100,Math.round((n/7)*80+(n===7?20:0)));
+  var grade=score>=95?'A+':score>=85?'A':score>=75?'B':score>=65?'C':'D';
+  showScreen('score');
+  setTimeout(function(){ document.getElementById('sarc').style.strokeDashoffset=515*(1-score/100); },200);
+  var c=0;
+  var ni=setInterval(function(){
+    c=Math.min(c+2,score);
+    document.getElementById('scnum').textContent=c;
+    if(c>=score) clearInterval(ni);
+  },22);
+  document.getElementById('scgrade').textContent=grade;
+  document.getElementById('scmsg').textContent=GRADE_MSG[grade];
+  SPEECH.say(L().scoreMsg(score, grade, L().gradeMsg[grade]||GRADE_MSG[grade]), true);
+  showSubtitle(L().scoreMsg(score, grade, L().gradeMsg[grade]||GRADE_MSG[grade]));
+  document.getElementById('st-steps').textContent=n+'/7';
+  document.getElementById('st-time').textContent=elapsed+'s';
+  document.getElementById('st-order').textContent=n===7?'\u2713 Correct':'~ Partial';
+  var bg=document.getElementById('scbadges');
+  bg.innerHTML='';
+  STEPS.forEach(function(s,i){
+    var b=document.createElement('div');
+    b.className='badge '+(done.has(i)?'ok':'miss');
+    b.textContent=(done.has(i)?'\u2713 ':'\u2717 ')+s.name;
+    bg.appendChild(b);
+  });
+  var entry={id:Date.now(),datetime:new Date().toLocaleString(),steps:n,duration:elapsed,score:score,grade:grade,order:n===7?'Correct':'Partial'};
+  history.unshift(entry); if(history.length>50) history=history.slice(0,50);
+  localStorage.setItem('washit_history',JSON.stringify(history));
+  var cd=12;
+  if(cdInt) clearInterval(cdInt);
+  cdInt=setInterval(function(){
+    cd--; document.getElementById('sccd').textContent='Returning to home in '+cd+'s...';
+    if(cd<=0){ clearInterval(cdInt); resetDemo(); }
+  },1000);
+}
+function resetDemo(){
+  SPEECH.stop();
+  clearInterval(simInt); clearInterval(timerInt); clearInterval(cdInt);
+  cur=0; done=new Set(); confRamp=0; simPhase=0; phaseStep=0;
+  document.getElementById('sarc').style.strokeDashoffset='515';
+  document.getElementById('meter-arc').style.strokeDashoffset='289';
+  document.getElementById('meter-pct').textContent='0%';
+  document.getElementById('sc-done').textContent='0';
+  document.getElementById('timer').textContent='00:00';
+  document.getElementById('cbar').style.width='0%';
+  document.getElementById('cval').textContent='\u2014';
+  showScreen('idle');
+}
+function renderHistory(){
+  var tbody=document.getElementById('hist-tbody');
+  var empty=document.getElementById('hist-empty');
+  var table=document.getElementById('hist-table');
+  var summary=document.getElementById('hist-summary');
+  if(history.length===0){ empty.style.display='flex'; table.style.display='none'; summary.innerHTML=''; return; }
+  empty.style.display='none'; table.style.display='table';
+  tbody.innerHTML='';
+  history.forEach(function(h,i){
+    var gc=h.grade==='A+'||h.grade==='A'?'gA':h.grade==='B'?'gB':h.grade==='C'?'gC':'gD';
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td style="color:var(--muted);font-family:var(--font-mono)">'+(history.length-i)+'</td><td>'+h.datetime+'</td><td style="font-family:var(--font-mono)">'+h.steps+'/7</td><td style="font-family:var(--font-mono)">'+h.duration+'s</td><td style="font-family:var(--font-mono);font-weight:700;color:var(--accent)">'+h.score+'</td><td><span class="grade-pill '+gc+'">'+h.grade+'</span></td><td style="color:'+(h.order==='Correct'?'var(--ok-col)':'var(--warn-col)')+'">'+h.order+'</td>';
+    tbody.appendChild(tr);
+  });
+  var avg=Math.round(history.reduce(function(a,h){return a+h.score;},0)/history.length);
+  var best=Math.max.apply(null,history.map(function(h){return h.score;}));
+  var perfect=history.filter(function(h){return h.steps===7;}).length;
+  var avgDur=Math.round(history.reduce(function(a,h){return a+h.duration;},0)/history.length);
+  summary.innerHTML='<div class="sum-card"><div class="sum-val">'+history.length+'</div><div class="sum-lbl">Total sessions</div></div><div class="sum-card"><div class="sum-val">'+avg+'%</div><div class="sum-lbl">Avg score</div></div><div class="sum-card"><div class="sum-val">'+best+'%</div><div class="sum-lbl">Best score</div></div><div class="sum-card"><div class="sum-val">'+perfect+'</div><div class="sum-lbl">Perfect (7/7)</div></div>';
+}
+function clearHistory(){ if(!confirm('Clear all session history?')) return; history=[]; localStorage.removeItem('washit_history'); renderHistory(); }
+function renderLeader(){
+  var sorted=history.slice().sort(function(a,b){return b.score-a.score;}).slice(0,10);
+  var top3=document.getElementById('top3-row');
+  var list=document.getElementById('lead-list');
+  var empty=document.getElementById('lead-empty');
+  if(sorted.length===0){ top3.innerHTML=''; list.innerHTML=''; list.appendChild(empty); empty.style.display='flex'; return; }
+  empty.style.display='none';
+  var medals=['gold','silver','bronze'], trophies=['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'];
+  top3.innerHTML='';
+  sorted.slice(0,3).forEach(function(h,i){
+    var d=document.createElement('div');
+    d.className='top3-card '+(medals[i]||'');
+    d.innerHTML='<div class="top3-trophy">'+(trophies[i]||'')+'</div><div class="top3-score">'+h.score+'%</div><div class="top3-name">Grade '+h.grade+'</div><div class="top3-date">'+h.datetime+'</div>';
+    top3.appendChild(d);
+  });
+  list.innerHTML='';
+  sorted.forEach(function(h,i){
+    var rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    var d=document.createElement('div');
+    d.className='lead-item';
+    d.innerHTML='<div class="lead-rank '+rc+'">'+(i+1)+'</div><div class="lead-info"><div class="lead-name">Session \u2014 Grade '+h.grade+' \u00B7 '+h.steps+'/7 steps</div><div class="lead-date">'+h.datetime+' \u00B7 '+h.duration+'s</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div class="lead-score">'+h.score+'%</div><div class="lead-bar-wrap"><div class="lead-bar" style="width:'+h.score+'%"></div></div></div>';
+    list.appendChild(d);
+  });
+}
+function clearLeader(){ if(!confirm('Clear all session history?')) return; history=[]; localStorage.removeItem('washit_history'); renderLeader(); }
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// LIVE BACKEND INTEGRATION — connects WASH-IT UI to server.py WebSocket
+// ═══════════════════════════════════════════════════════════════════════
+// This file replaces the fake startSim()/timer-based simulation with a
+// real WebSocket connection to the FastAPI guided-handwash server.
+// Every visual element (theme, drawer, history, leaderboard, diagrams,
+// speech, subtitles) is untouched — only the DATA SOURCE changes.
+//
+// Architecture
+// ------------
+//   server.py's GuidedSequenceController already does the heavy lifting:
+//   it tracks "current expected step", accumulates compliant time with
+//   forgiving decay, and emits a JSON status message on every inference
+//   tick. This script listens for those messages and drives the EXISTING
+//   UI functions (updateConf, updateMeter, completeStep, setStep, etc.)
+//   with real numbers instead of Math.random().
+//
+// How matching works
+// -------------------
+//   server.py's step indices (0-6) map 1:1 onto this UI's STEPS array
+//   and cur/done state — no remapping needed, the WHO step order is
+//   identical on both sides.
+//
+// Usage
+// -----
+//   Include this script AFTER the main inline <script> block (so STEPS,
+//   L(), SPEECH, showSubtitle, etc. already exist), then call:
+//     connectLiveBackend("ws://<pi-ip>:8000/ws")
+//   instead of (or in addition to) startDemo().
+
+let liveSocket = null;
+let liveConnected = false;
+let __lastPhase = null;
+let __doneShown = false;
+let __awaitingPrime = false;
+let __failed = new Set();
+let __prevTheme = null;
+
+// ── inject the full-screen phase overlay (soap / get-set / redo / rinse) ──
+(function injectPhaseOverlay() {
+  if (document.getElementById('phase-ov')) return;
+  const css = document.createElement('style');
+  css.textContent = `
+    .phase-ov{position:fixed;inset:0;z-index:9999;display:none;
+      flex-direction:column;align-items:center;justify-content:center;gap:14px;
+      background:rgba(0,0,0,.62);backdrop-filter:blur(6px);
+      font-family:var(--font-head,sans-serif);text-align:center;padding:24px}
+    .phase-ov.show{display:flex}
+    .phase-ov-big{font-size:clamp(60px,16vw,150px);font-weight:900;line-height:1;
+      color:var(--accent,#00b4ff);filter:var(--glow,none)}
+    .phase-ov-title{font-size:clamp(22px,4vw,40px);font-weight:800;color:var(--text,#fff)}
+    .phase-ov-sub{font-size:clamp(14px,2.4vw,20px);color:var(--muted2,#9ab);max-width:560px}
+    .phase-ov-tag{font-size:14px;letter-spacing:3px;text-transform:uppercase;
+      color:var(--muted,#789)}
+    .phase-ov.redo{background:#ffffff;backdrop-filter:none}
+    .phase-ov.redo .phase-ov-tag{color:#e0405a;font-weight:800}
+    .phase-ov.redo .phase-ov-big{color:#e0405a;filter:none}
+    .phase-ov.redo .phase-ov-title{color:#16202b}
+    .phase-ov.redo .phase-ov-sub{color:#46505a}
+  `;
+  document.head.appendChild(css);
+  const ov = document.createElement('div');
+  ov.id = 'phase-ov';
+  ov.className = 'phase-ov';
+  ov.innerHTML =
+    '<div class="phase-ov-tag" id="phase-ov-tag"></div>' +
+    '<div class="phase-ov-big" id="phase-ov-big"></div>' +
+    '<div class="phase-ov-title" id="phase-ov-title"></div>' +
+    '<div class="phase-ov-sub" id="phase-ov-sub"></div>';
+  (document.getElementById('app') || document.body).appendChild(ov);
+})();
+
+// ── extra styles (red "missed" circle) + fit-to-viewport auto-scaler ──────
+(function injectExtras() {
+  const css = document.createElement('style');
+  css.textContent = `
+    html,body{overflow:hidden;height:100%}
+    body{display:block}
+    /* center the whole app against the VIEWPORT (not a growable body) and scale */
+    #app{position:fixed;top:50%;left:50%;margin:0!important}
+    #s-idle,#s-session,#s-score,#s-history,#s-leader{min-height:0}
+    .si.fail .si-chk{background:#e0405a;border-color:#e0405a;color:#fff}
+    .si.fail .si-name{color:#e0405a;font-weight:600}
+    .si.fail{opacity:1}
+  `;
+  document.head.appendChild(css);
+
+  let lastS = -1;
+  function fitApp() {
+    const app = document.getElementById('app');
+    if (!app) return;
+    const W = app.offsetWidth, H = app.offsetHeight;   // layout box (transform-independent)
+    if (!W || !H) return;
+    const S = Math.min((window.innerWidth - 12) / W, (window.innerHeight - 12) / H, 1);
+    if (Math.abs(S - lastS) > 0.002) {
+      lastS = S;
+      app.style.transformOrigin = 'center center';
+      app.style.transform = 'translate(-50%,-50%) scale(' + S.toFixed(3) + ')';
+    }
+  }
+  window.__fitApp = fitApp;
+  window.addEventListener('resize', function () { lastS = -1; fitApp(); });
+  window.addEventListener('load', fitApp);
+  setTimeout(fitApp, 120);
+  setInterval(fitApp, 300);    // re-fit as the active screen changes height
+})();
+
+function showPhaseOverlay(tag, big, title, sub) {
+  const ov = document.getElementById('phase-ov');
+  ov.classList.add('show');
+  document.getElementById('phase-ov-tag').textContent = tag || '';
+  document.getElementById('phase-ov-big').textContent = (big === null || big === undefined) ? '' : big;
+  document.getElementById('phase-ov-title').textContent = title || '';
+  document.getElementById('phase-ov-sub').textContent = sub || '';
+}
+function hidePhaseOverlay() {
+  const ov = document.getElementById('phase-ov');
+  ov.classList.remove('show', 'redo');
+}
+
+// distinct white/red full-screen alert listing the missed steps before redo
+function showRedoIntro(missedArr, countdown) {
+  const ov = document.getElementById('phase-ov');
+  ov.classList.add('show', 'redo');
+  const names = (missedArr || []).map(function (k) { return (k + 1); }).join(', ');
+  document.getElementById('phase-ov-tag').textContent = 'Redo Required';
+  document.getElementById('phase-ov-big').textContent = '\u26A0';
+  document.getElementById('phase-ov-title').textContent = 'Missed steps: ' + names;
+  document.getElementById('phase-ov-sub').textContent = 'Get ready to redo them — ' + countdown + 's';
+}
+
+// the front-page "Start Handwashing Session" button now connects to the camera too
+startDemo = function () {
+  connectLiveBackend(document.getElementById('live-server-addr').value);
+};
+
+// ── visibility / activity guidance in the feedback banner ─────────────────
+function showVisibilityGuidance(text) {
+  const fb = document.getElementById('fbb');
+  fb.className = 'fb-banner warn';
+  document.getElementById('fbico').textContent = '\uD83D\uDCF7';
+  document.getElementById('fbtxt').textContent = text || 'Move your hands into view';
+}
+
+// ── narrate once when a phase begins ──────────────────────────────────────
+function onPhaseEnter(phase, status) {
+  // theme switches to WHITE for the whole redo as a strong visual alert
+  const app = document.getElementById('app');
+  if (phase === 'REMEDIATE') {
+    if (__prevTheme === null) __prevTheme = app.getAttribute('data-theme');
+    app.setAttribute('data-theme', 'white');
+  } else if (__prevTheme !== null) {
+    app.setAttribute('data-theme', __prevTheme);
+    __prevTheme = null;
+  }
+
+  let line = '';
+  if (phase === 'PRIME') {
+    line = 'Show both hands to the camera to begin.';
+  } else if (phase === 'SOAP') {
+    // hands detected + buffer full -> the process is starting; start the clock NOW
+    startTimer();
+    line = 'Hands detected. Wet your hands and apply soap.';
+  } else if (phase === 'GETSET') {
+    line = 'Get ready. Begin step one.';
+  } else if (phase === 'REMEDIATE') {
+    line = 'You missed some steps. Get ready to redo them.';
+  } else if (phase === 'RINSE') {
+    line = 'Now rinse your hands under running water.';
+  }
+  if (line) { try { SPEECH.say(line, false); } catch (e) {} showSubtitle(line); }
+}
+
+// ── per-phase renderers ───────────────────────────────────────────────────
+function renderPrime(s) {
+  const pct = Math.round((s.buffer_fill || 0) * 100);
+  if (s.visibility_ok === false) {
+    showPhaseOverlay('Waiting', null, 'Show BOTH hands to the camera',
+                     'The session begins once your hands are detected');
+  } else {
+    showPhaseOverlay('Get ready', pct + '%', 'Hands detected — hold steady',
+                     'Preparing the model… ' + pct + '%');
+  }
+}
+
+function renderGate(s, title) {                       // SOAP and RINSE
+  const secs = Math.max(0, Math.ceil(s.phase_remaining || 0));
+  showPhaseOverlay(s.phase, secs + 's', title, s.guidance || '');
+}
+
+function renderGetset(s) {
+  showPhaseOverlay('Get set', s.countdown, 'Begin Step 1 — ' + STEPS[0].name, '');
+}
+
+function renderRedo(s) {
+  if (s.redo_phase === 'intro') {
+    showRedoIntro(s.redo_missed, s.redo_intro_left);   // blank white alert listing missed steps
+    applyCircles(s);
+    return;
+  }
+  hidePhaseOverlay();                 // redo runs on the live session screen, not a blank overlay
+  const k = s.redo_step;
+  const name = STEPS[k] ? STEPS[k].name : ('Step ' + (k + 1));
+  if (typeof k === 'number' && k !== cur) { cur = k; setStep(k); }
+  applyCircles(s);                    // green = done, red = still-missed, highlight = current redo step
+
+  const fb = document.getElementById('fbb');
+  if (s.redo_phase === 'getready') {
+    fb.className = 'fb-banner warn';
+    document.getElementById('fbico').textContent = '\u23F3';
+    document.getElementById('fbtxt').innerHTML =
+      'Redo <b>Step ' + (k + 1) + ' — ' + name + '</b> starting in ' + s.redo_countdown + 's';
+  } else {
+    const left = (s.redo_remaining != null) ? Math.ceil(s.redo_remaining) + 's left' : '';
+    if (s.detecting) {
+      fb.className = 'fb-banner ok';
+      document.getElementById('fbico').textContent = '\u2705';
+      document.getElementById('fbtxt').innerHTML =
+        'Detecting <b>Step ' + (k + 1) + '</b> — hold it &middot; ' + left;
+    } else {
+      fb.className = 'fb-banner warn';
+      document.getElementById('fbico').textContent = '\u21BB';
+      document.getElementById('fbtxt').innerHTML =
+        'Redo <b>Step ' + (k + 1) + ' — ' + name + '</b> &middot; ' + left;
+    }
+    const predName = STEPS[s.predicted_step] ? STEPS[s.predicted_step].name : '—';
+    if (s.confidence != null) updateConf(Math.round((s.confidence || 0) * 100), predName);
+  }
+}
+
+function renderRun(s) {
+  hidePhaseOverlay();
+
+  // The backend clock is the source of truth for pacing. Advance the current
+  // step and sync the checklist circles EVERY tick, BEFORE any early-return —
+  // a momentary loss of hand visibility must not freeze the step timeline.
+  if (typeof s.current_step === 'number' && s.current_step !== cur) {
+    cur = s.current_step;
+    setStep(cur);
+  }
+  applyCircles(s);
+
+  if (s.buffering) {
+    updateConf(Math.round((s.buffer_fill || 0) * 100), 'Buffering…');
+    return;
+  }
+  if (s.visibility_ok === false) {
+    showVisibilityGuidance(s.guidance);
+    return;
+  }
+
+  const predName = STEPS[s.predicted_step] ? STEPS[s.predicted_step].name : '—';
+  updateConf(Math.round((s.confidence || 0) * 100), predName);
+
+  // feedback banner (with the per-step slot countdown so the 8s rule is visible)
+  const slotTxt = (s.slot_left != null) ? ' &middot; ' + Math.ceil(s.slot_left) + 's left' : '';
+  const fb = document.getElementById('fbb');
+  if (s.is_compliant) {
+    fb.className = 'fb-banner ok';
+    document.getElementById('fbico').textContent = '\u2705';
+    document.getElementById('fbtxt').innerHTML =
+      'Performing <b>Step ' + (s.current_step + 1) + '</b> — ' +
+      (s.cur_det_s != null ? s.cur_det_s.toFixed(1) + 's held' : 'keep going') + slotTxt;
+  } else if (s.struggling) {
+    fb.className = 'fb-banner warn';
+    document.getElementById('fbico').textContent = '\u26A0\uFE0F';
+    document.getElementById('fbtxt').innerHTML =
+      (STEPS[s.current_step] ? STEPS[s.current_step].corrective : '') + slotTxt;
+  } else {
+    fb.className = 'fb-banner';
+    document.getElementById('fbico').textContent = '\uD83D\uDC40';
+    document.getElementById('fbtxt').innerHTML =
+      'Watching for <b>Step ' + (s.current_step + 1) + ' — ' +
+      (STEPS[s.current_step] ? STEPS[s.current_step].name : '') + '</b>' + slotTxt;
+  }
+
+  // meter = revealed steps + within-slot progress
+  const meterPct = Math.round(
+    (((s.completed_steps ? s.completed_steps.length : 0) + (s.progress || 0)) / 7) * 100);
+  document.getElementById('meter-pct').textContent = meterPct + '%';
+  document.getElementById('meter-arc').style.strokeDashoffset = 289 * (1 - meterPct / 100);
+}
+
+// paint the right-side circles: green = done, red = missed, highlight = current
+function _paintCircles() {
+  document.querySelectorAll('.si').forEach(function (el, i) {
+    let c = 'si';
+    if (done.has(i)) c = 'si done';
+    else if (i === cur) c = 'si cur';
+    else if (__failed.has(i)) c = 'si fail';
+    el.className = c;
+  });
+}
+function applyCircles(s) {
+  const comp = s.completed_steps || [];
+  __failed = new Set(s.failed_steps || []);
+  document.getElementById('sc-done').textContent = comp.length;
+  if (comp.length > done.size) {
+    const justDone = comp[comp.length - 1];
+    done = new Set(comp);
+    doFlash('green');
+    try { SPEECH.say(L().stepDone(L().stepNames[justDone], L().steps[justDone]), true); } catch (e) {}
+    showSubtitle(L().stepDone(L().stepNames[justDone], L().steps[justDone]));
+  } else {
+    done = new Set(comp);
+  }
+  _paintCircles();
+}
+
+// ── final score screen, driven by the backend verdict ─────────────────────
+function renderDone(s) {
+  if (__doneShown) return;          // server keeps sending DONE; only act once
+  __doneShown = true;
+  hidePhaseOverlay();
+  if (timerInt) clearInterval(timerInt);
+
+  document.getElementById('st-steps').textContent = (s.steps_done != null ? s.steps_done : 0) + '/7';
+  document.getElementById('st-time').textContent = (s.duration_s != null ? s.duration_s : 0) + 's';
+  document.getElementById('st-order').textContent = s.order || '—';
+
+  const grade = s.grade || '—';
+  document.getElementById('scgrade').textContent = grade;
+  const gmsg = (L().gradeMsg && L().gradeMsg[grade]) ? L().gradeMsg[grade] : '';
+  document.getElementById('scmsg').textContent = gmsg;
+
+  // animate the score ring + number
+  const score = s.score != null ? s.score : 0;
+  document.getElementById('sarc').style.strokeDashoffset = 515 * (1 - score / 100);
+  let shown = 0;
+  const tick = setInterval(function () {
+    shown += Math.max(1, Math.round(score / 30));
+    if (shown >= score) { shown = score; clearInterval(tick); }
+    document.getElementById('scnum').textContent = shown;
+  }, 30);
+
+  // per-step + soap/rinse badges
+  const badges = document.getElementById('scbadges');
+  if (badges) {
+    let html = '';
+    html += _badge('Soap', s.soap_done);
+    (s.results || []).forEach(function (r, i) {
+      const label = (STEPS[i] ? STEPS[i].name : 'Step ' + (i + 1)) + (r.retry ? ' (redo)' : '');
+      html += _badge(label, r.passed);
+    });
+    html += _badge('Rinse', s.rinse_done);
+    badges.innerHTML = html;
+  }
+
+  try { SPEECH.say(L().scoreMsg(score, grade, gmsg), true); } catch (e) {}
+  showSubtitle('Session complete — score ' + score + ', grade ' + grade);
+
+  // save to history (same record shape the demo's showScore uses)
+  try {
+    var entry = { id: Date.now(), datetime: new Date().toLocaleString(),
+      steps: (s.steps_done != null ? s.steps_done : 0),
+      duration: (s.duration_s != null ? s.duration_s : 0),
+      score: score, grade: grade, order: s.order || '—' };
+    history.unshift(entry);
+    if (history.length > 50) history = history.slice(0, 50);
+    localStorage.setItem('washit_history', JSON.stringify(history));
+  } catch (e) {}
+
+  // kiosk auto-return countdown -- LIVE MODE ONLY: skip this entirely.
+  // The server-side watchdog is the sole authority on when to return to
+  // idle in live mode; this client-side timer is redundant with it and,
+  // if a new session started before this timer fired, resetDemoWithLiveSupport()
+  // would actively close that NEW session's connection -- a real bug, not
+  // just a display glitch. Demo mode (no live connection) still uses it.
+  if (!liveConnected) {
+    var cd = 12;
+    if (cdInt) clearInterval(cdInt);
+    cdInt = setInterval(function () {
+      cd--;
+      var el = document.getElementById('sccd');
+      if (el) el.textContent = 'Returning to home in ' + cd + 's...';
+      if (cd <= 0) { clearInterval(cdInt); resetDemoWithLiveSupport(); }
+    }, 1000);
+  } else {
+    var el0 = document.getElementById('sccd');
+    if (el0) el0.textContent = 'Waiting for the next person...';
+  }
+
+  showScreen('score');
+}
+function _badge(label, ok) {
+  const cls = ok ? 'ok' : 'miss';
+  const ico = ok ? '\u2713' : '\u2717';
+  return '<div class="badge ' + cls + '">' + ico + ' ' + label + '</div>';
+}
+
+// PIR passive auto-connect: DISABLED for now (reverted to manual Start
+// button only, per request, while PIR hardware triggering is revisited
+// later). The underlying support (connectLiveBackend(url, false) for a
+// passive listen-only connection, enterSessionView() firing on the first
+// real phase) is still in place -- just re-enable this block to turn PIR
+// auto-start back on once that's ready to test again:
+//
+// window.addEventListener('load', function () {
+//   try { connectLiveBackend('ws://localhost:8000/ws', false); }
+//   catch (e) { console.log('[WASH-IT] passive auto-connect failed:', e); }
+// });
+
+// ── PIR sensor trigger (SSE) ─────────────────────────────────────────────
+// Listens for a "trigger" push from the backend's /events endpoint (sent
+// when the PIR sensor detects motion while the engine is IDLE) and
+// simulates a Start-button press -- runs the EXACT SAME code path a real
+// tap does (startDemo() -> connectLiveBackend() -> sends 'reset'), so
+// there's only ever one way a session actually starts.
+const triggerSession = (function () {
+  let isSessionActive = false;
+  return function () {
+    if (isSessionActive) return;
+    isSessionActive = true;
+    startDemo();
+    setTimeout(function () { isSessionActive = false; }, 20000);
+  };
+})();
+
+try {
+  const eventSource = new EventSource('http://localhost:5000/events');
+  eventSource.onmessage = function (event) {
+    if (event.data === 'trigger') triggerSession();
+  };
+  eventSource.onerror = function () {
+    console.log('[WASH-IT] PIR event stream unavailable (backend --pir-pin not set, or /events unreachable) -- manual Start button still works.');
+  };
+} catch (e) {
+  console.log('[WASH-IT] Could not set up PIR event listener:', e);
+}
+
+// ── debug readout -- always visible, tiny, top-left ─────────────────────────
+// Shows exactly what the JS thinks is happening at a glance -- so a single
+// photo of the screen tells us the real internal state (phase, whether
+// enterSessionView ran, which screen element is actually visible) instead
+// of guessing from server logs alone.
+let __debugBox = null;
+function updateDebugBox(extra) {
+  if (!__debugBox) {
+    __debugBox = document.createElement('div');
+    __debugBox.id = 'washit-debug-box';
+    __debugBox.style.cssText = [
+      'position:fixed', 'top:10px', 'left:10px', 'z-index:999999',
+      'background:rgba(0,0,0,.6)', 'color:#0f0', 'font-family:monospace',
+      'font-size:11px', 'padding:4px 8px', 'border-radius:6px',
+      'pointer-events:none', 'white-space:pre'
+    ].join(';');
+    document.body.appendChild(__debugBox);
+  }
+  const visible = document.querySelector('.scr.on');
+  const visibleId = visible ? visible.id : '(none)';
+  __debugBox.textContent =
+    'phase=' + (__lastPhase || '?') +
+    ' entered=' + __sessionEntered +
+    ' visible=' + visibleId +
+    ' cdInt=' + (typeof cdInt !== 'undefined' && cdInt ? 'ACTIVE' : 'none') +
+    (extra ? ' ' + extra : '');
+}
+setInterval(function () { updateDebugBox(); }, 500);
+
+// ── emergency stop button -- always visible, on top of every screen ────────
+(function injectEmergencyStop() {
+  const btn = document.createElement('button');
+  btn.id = 'emergency-stop-btn';
+  btn.textContent = 'STOP';
+  btn.style.cssText = [
+    'position:fixed', 'top:10px', 'right:10px', 'z-index:999999',
+    'background:#c0203a', 'color:#fff', 'border:none', 'border-radius:10px',
+    'padding:10px 16px', 'font-size:14px', 'font-weight:700',
+    'letter-spacing:.05em', 'box-shadow:0 2px 8px rgba(0,0,0,.35)',
+    'cursor:pointer'
+  ].join(';');
+  btn.onclick = function () {
+    if (!confirm('Stop and return to the desktop?')) return;
+    try {
+      const es = new WebSocket('ws://localhost:8000/ws');
+      es.onopen = function () {
+        es.send('emergency_stop');
+        setTimeout(function () { es.close(); }, 300);
+      };
+      es.onerror = function () {
+        alert('Could not reach the backend to stop it.');
+      };
+    } catch (e) {
+      alert('Could not reach the backend: ' + e);
+    }
+  };
+  document.body.appendChild(btn);
+})();
+
+// ── fill-the-whole-screen auto-scaler ──────────────────────────────────────
+(function injectFullscreenFit() {
+  const css = document.createElement('style');
+  css.textContent = `
+    html,body{overflow:hidden;height:100%;margin:0}
+    body{display:block;background:var(--app-bg)}
+    #app{position:fixed;top:50%;left:50%;margin:0!important}
+  `;
+  document.head.appendChild(css);
+
+  let lastS = -1;
+  function fitApp() {
+    const app = document.getElementById('app');
+    if (!app) return;
+    const W = app.offsetWidth, H = app.offsetHeight;
+    if (!W || !H) return;
+    // UNIFORM scale (same factor both axes) -- text and boxes keep their
+    // real proportions, no stretching. Fills as much of the screen as
+    // possible without cropping; any leftover margin is filled with the
+    // app's own background color (see body{background:var(--app-bg)}
+    // below) so it reads as intentional, not as empty browser chrome.
+    const S = Math.min(window.innerWidth / W, window.innerHeight / H);
+    if (Math.abs(S - lastS) > 0.002) {
+      lastS = S;
+      app.style.transformOrigin = 'center center';
+      app.style.transform = 'translate(-50%,-50%) scale(' + S.toFixed(3) + ')';
+    }
+  }
+  window.__fitApp = fitApp;
+  window.addEventListener('resize', function () { lastS = -1; fitApp(); });
+  window.addEventListener('load', fitApp);
+  setTimeout(fitApp, 120);
+  setInterval(fitApp, 300);
+})();
+
+// ── main message handler ──────────────────────────────────────────────────
+let __camFeedUrl = null;
+function renderCamFrame(blob) {
+  const url = URL.createObjectURL(blob);
+  document.getElementById('cam-feed').src = url;
+  if (__camFeedUrl) URL.revokeObjectURL(__camFeedUrl);
+  __camFeedUrl = url;
+}
+
+function handleLiveStatus(status) {
+  const phase = status.phase || 'RUN';
+
+  // After connect we send a reset; ignore any leftover non-PRIME messages from a
+  // previous session until the fresh PRIME (server actually restarted) arrives.
+  if (__awaitingPrime) {
+    if (phase === 'PRIME') { __awaitingPrime = false; }
+    else { return; }
+  }
+
+  // Passive/PIR mode: the browser has been quietly connected since page
+  // load, sitting on the idle screen. The moment a real (non-IDLE) phase
+  // shows up, that means the PIR sensor triggered a session server-side --
+  // switch into the live session view now, automatically.
+  if (!__sessionEntered) {
+    if (phase === 'IDLE') return;   // still nobody there -- stay on idle screen
+    enterSessionView();
+  }
+
+  if (phase !== __lastPhase) { onPhaseEnter(phase, status); __lastPhase = phase; }
+
+  switch (phase) {
+    case 'IDLE':
+      if (__sessionEntered) {
+        // the watchdog auto-returned the engine to IDLE after showing the
+        // DONE results -- reset the browser back to the idle front screen,
+        // ready for the PIR to trigger the next person's session
+        __sessionEntered = false;
+        __lastPhase = null;
+        __doneShown = false;
+        const camCard = document.getElementById('cam-card');
+        if (camCard) { camCard.style.display = 'none'; camCard.closest('.top-row').classList.add('cam-hidden'); }
+        const manual = document.querySelector('.manual-row');
+        if (manual) manual.style.display = '';
+        showScreen('idle');
+      }
+      return;
+    case 'PRIME':     return renderPrime(status);
+    case 'SOAP':      return renderGate(status, 'Wet hands & apply soap');
+    case 'GETSET':    return renderGetset(status);
+    case 'RUN':       return renderRun(status);
+    case 'REMEDIATE': return renderRedo(status);
+    case 'RINSE':     return renderGate(status, 'Rinse hands under water');
+    case 'DONE':      return renderDone(status);
+    default:          return renderRun(status);
+  }
+}
+
+// ── connect / reset ───────────────────────────────────────────────────────
+// Switches the UI from the idle front screen into the live session view.
+// Called immediately for a manual Start-button connect, or lazily -- the
+// first time a real (non-IDLE) phase arrives -- for a passive/PIR-triggered
+// auto-connect, so the idle "Approach the sensor to begin" screen stays
+// showing until someone actually approaches.
+let __sessionEntered = false;
+let __enterCallCount = 0, __enterRanCount = 0;
+function enterSessionView() {
+  __enterCallCount++;
+  if (__sessionEntered) { updateDebugBox('BLOCKED#' + __enterCallCount); return; }
+  __sessionEntered = true;
+  __enterRanCount++;
+  updateDebugBox('RAN#' + __enterRanCount + '/' + __enterCallCount);
+  // Cancel any leftover "Returning to home in Xs..." countdown from a
+  // PREVIOUS session's results screen. That countdown runs independently
+  // of live-session state and, left uncancelled, fires resetDemo() and
+  // forces the screen back to idle -- even mid-way through a brand new
+  // session it has no idea has already started.
+  if (typeof cdInt !== 'undefined' && cdInt) { clearInterval(cdInt); cdInt = null; }
+  cur = 0; done = new Set(); __failed = new Set(); __lastPhase = null; __doneShown = false;
+  if (__prevTheme !== null) {            // restore theme if a prior redo was interrupted
+    document.getElementById('app').setAttribute('data-theme', __prevTheme);
+    __prevTheme = null;
+  }
+  if (typeof countdownAnnounced !== 'undefined') countdownAnnounced = {};
+  buildList(); setStep(0); updateMeter();
+  showScreen('session');
+  const camCard = document.getElementById('cam-card');
+  camCard.style.display = 'flex';
+  camCard.closest('.top-row').classList.remove('cam-hidden');
+  const manual = document.querySelector('.manual-row');
+  if (manual) manual.style.display = 'none';        // hide demo buttons in live mode
+  document.getElementById('timer').textContent = '00:00';
+  showPhaseOverlay('Connecting', null, 'Show BOTH hands to the camera',
+                   'Waiting for the camera server…');
+}
+
+// autoReset=true (default): manual trigger (Start button / Connect button)
+//   -- connects and immediately forces a session to begin, same as before.
+// autoReset=false: passive trigger (called automatically on page load) --
+//   connects and quietly listens, WITHOUT starting anything. The idle
+//   screen stays visible until the PIR sensor (server-side) detects someone
+//   and moves the engine out of IDLE on its own; enterSessionView() then
+//   fires automatically the first time a real phase shows up.
+function connectLiveBackend(wsUrl, autoReset) {
+  if (autoReset === undefined) autoReset = true;
+  if (liveSocket) liveSocket.close();
+  __lastPhase = null;
+
+  if (autoReset) {
+    __sessionEntered = false;   // force re-entry even on 2nd/3rd+ manual session
+    enterSessionView();
+    __awaitingPrime = true;
+  }
+  // NOTE: deliberately NO startTimer() and NO welcome here. The UI sits in the
+  // PRIME overlay (see renderPrime) and does not "start" until the server
+  // detects both hands + finishes buffering and leaves PRIME (see onPhaseEnter).
+
+  const mySocket = new WebSocket(wsUrl);
+  liveSocket = mySocket;
+  // Guard against a stale/closing connection's messages arriving AFTER a
+  // newer one has already taken over -- e.g. the PIR firing session 2
+  // right as session 1's socket is still finishing up. Without this, a
+  // late "IDLE" from the OLD socket could land after the NEW socket's
+  // "PRIME" and incorrectly snap the screen back to idle, even though
+  // the real session is already running correctly server-side.
+  mySocket.onopen = function () {
+    if (liveSocket !== mySocket) return;   // superseded before it even opened
+    liveConnected = true;
+    console.log('[WASH-IT] connected:', wsUrl, autoReset ? '(manual start)' : '(passive listen)');
+    if (autoReset) mySocket.send('reset');     // force a clean server-side session
+  };
+  mySocket.onmessage = function (e) {
+    if (liveSocket !== mySocket) return;   // stale connection -- ignore
+    if (e.data instanceof Blob) {
+      renderCamFrame(e.data);
+      return;
+    }
+    handleLiveStatus(JSON.parse(e.data));
+  };
+  mySocket.onclose = function () {
+    if (liveSocket !== mySocket) return;
+    liveConnected = false; console.log('[WASH-IT] closed');
+  };
+  mySocket.onerror = function () {
+    if (liveSocket !== mySocket) return;
+    const fb = document.getElementById('fbb');
+    fb.className = 'fb-banner warn';
+    document.getElementById('fbtxt').textContent =
+      'Cannot reach the camera server. Is server.py running?';
+  };
+}
+
+function resetLiveBackend() {
+  if (liveSocket && liveSocket.readyState === WebSocket.OPEN) liveSocket.send('reset');
+  cur = 0; done = new Set(); __failed = new Set(); __lastPhase = null; __doneShown = false;
+}
+
+const _origReset = (typeof resetDemo === 'function') ? resetDemo : null;
+function resetDemoWithLiveSupport() {
+  if (liveConnected) { resetLiveBackend(); if (liveSocket) liveSocket.close(); }
+  hidePhaseOverlay();
+  const camCard = document.getElementById('cam-card');
+  camCard.style.display = 'none';
+  camCard.closest('.top-row').classList.add('cam-hidden');
+  const manual = document.querySelector('.manual-row');
+  if (manual) manual.style.display = '';
+  if (_origReset) _origReset();
+}
+</script>
+</body>
+</html>

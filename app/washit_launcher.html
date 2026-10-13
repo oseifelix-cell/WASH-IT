@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WASH-IT — Choose Mode</title>
+<style>
+  :root{
+    --bg1:#0b1e3a; --bg2:#0f2c54; --cyan:#00d4ff; --mint:#4be3a6;
+    --amber:#ffb703; --ink:#eaf2ff; --muted:#9fb3d0;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:'Segoe UI',Nunito,system-ui,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, var(--bg2), var(--bg1));
+    color:var(--ink); display:flex; flex-direction:column; align-items:center;
+    justify-content:center; min-height:100vh; padding:24px; overflow:hidden; text-align:center;
+  }
+  .brand h1{
+    font-size:clamp(56px,13vw,120px); margin:0; letter-spacing:3px; font-weight:800;
+    background:linear-gradient(90deg,var(--cyan),var(--mint));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .sub{ color:var(--muted); margin:10px 0 0; font-size:clamp(15px,2.6vw,20px);
+    letter-spacing:2px; text-transform:uppercase }
+  .cards{ display:flex; gap:26px; margin-top:48px; flex-wrap:wrap; justify-content:center }
+  .card{
+    width:280px; max-width:86vw; min-height:150px; display:flex; align-items:center;
+    justify-content:center; background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.12); border-radius:22px; padding:30px 24px;
+    cursor:pointer; transition:transform .15s, border-color .15s, background .15s;
+    font-size:24px; font-weight:700; letter-spacing:.5px;
+  }
+  .card:hover{ transform:translateY(-6px); border-color:var(--cyan); background:rgba(0,212,255,.08) }
+  .card.kids:hover{ border-color:var(--amber); background:rgba(255,183,3,.09) }
+  .server{ margin-top:48px; display:flex; gap:8px; align-items:center; justify-content:center;
+    color:var(--muted); font-size:13px; opacity:.75 }
+  .server input{ background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.15);
+    color:var(--ink); border-radius:8px; padding:8px 10px; width:230px; font-size:13px }
+</style>
+</head>
+<body>
+  <div class="brand">
+    <h1>WASH-IT</h1>
+    <div class="sub">Choose Mode</div>
+  </div>
+
+  <div class="cards">
+    <div class="card" onclick="go('compliance')">Compliance Mode</div>
+    <div class="card kids" onclick="go('kids')">Educational Mode</div>
+  </div>
+
+  <div class="server">
+    <label for="ws">Server:</label>
+    <input id="ws" value="ws://localhost:8001/ws" spellcheck="false">
+  </div>
+
+<script>
+  try { const saved = localStorage.getItem('washit_ws'); if (saved) document.getElementById('ws').value = saved; } catch (e) {}
+  const FILES = { compliance: 'washit_v7_live.html', kids: 'washit_kids_live.html' };
+  function go(mode) {
+    const ws = document.getElementById('ws').value.trim() || 'ws://localhost:8001/ws';
+    try { localStorage.setItem('washit_ws', ws); } catch (e) {}
+    window.location.href = FILES[mode] + '?ws=' + encodeURIComponent(ws) + '&autoconnect=1';
+  }
+</script>
+</body>
+</html>

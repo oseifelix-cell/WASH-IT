@@ -218,3 +218,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+# add these lines to the .gitignore GitHub created
+*.pt
+*.pth
+*.ckpt
+*.task
+*.mp4
+data/
+handwash_7class_remapped/
+handwash_tcn_dataset_v6/
+.env

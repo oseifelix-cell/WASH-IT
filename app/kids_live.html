@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WASH-IT Kids Demo - Beat the Germ Gang!</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ocean:   #0B1F3A;
+    --deep:    #071528;
+    --cyan:    #00D4FF;
+    --yellow:  #FFE047;
+    --coral:   #FF5A5F;
+    --mint:    #00C48C;
+    --white:   #FFFFFF;
+    --surface: rgba(255,255,255,0.07);
+    --border:  rgba(0,212,255,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--ocean);
+    color: var(--white);
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Floating bubble atmosphere */
+  .bg-bubble {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(0,212,255,0.25), rgba(0,212,255,0.05));
+    border: 1px solid rgba(0,212,255,0.15);
+    animation: floatUp linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(110vh) scale(1);   opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-10vh) scale(1.1); opacity: 0; }
+  }
+
+  /* Top nav */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 52px; z-index: 40;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px;
+    background: rgba(7,21,40,0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem; color: var(--cyan);
+    letter-spacing: 1px; margin-right: 8px;
+  }
+  .nav-btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.78rem; letter-spacing: 0.5px;
+    padding: 7px 16px; border-radius: 50px;
+    border: 1px solid transparent;
+    background: transparent; color: rgba(255,255,255,0.55);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .nav-btn:hover { color: var(--white); }
+  .nav-btn.active { background: rgba(0,212,255,0.12); border-color: var(--border); color: var(--cyan); }
+  .nav-spacer { flex: 1; }
+  .gear-btn {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--cyan); font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s;
+  }
+  .gear-btn:hover { transform: rotate(45deg); }
+
+  /* Screens */
+  .screen {
+    position: absolute; inset: 0; top: 52px; z-index: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    transition: opacity 0.4s, transform 0.4s;
+    overflow-y: auto;
+  }
+  .screen.hidden { opacity: 0; pointer-events: none; transform: scale(0.97); }
+
+  /* HOME */
+  #home-screen { gap: 20px; padding: 24px; }
+  .logo-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    color: var(--cyan);
+    text-shadow: 0 0 30px rgba(0,212,255,0.6), 0 4px 0 rgba(0,0,0,0.4);
+    letter-spacing: 2px; text-align: center;
+  }
+  .logo-sub {
+    font-size: 1.05rem; font-weight: 800;
+    color: var(--yellow); margin-top: 4px;
+    letter-spacing: 1px; text-align: center;
+  }
+  .bubbles-hero {
+    width: 170px; height: 170px;
+    animation: heroBob 2.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(0,212,255,0.5));
+  }
+  @keyframes heroBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  .home-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 20px 28px;
+    max-width: 520px; width: calc(100% - 40px);
+    text-align: center;
+  }
+  .home-card h2 { font-family: 'Fredoka One', cursive; font-size: 1.35rem; color: var(--cyan); margin-bottom: 8px; }
+  .home-card p  { font-size: 0.92rem; color: rgba(255,255,255,0.75); line-height: 1.6; }
+  .btn-play {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.35rem; letter-spacing: 1px;
+    padding: 17px 54px;
+    border: none; border-radius: 50px; cursor: pointer;
+    background: linear-gradient(135deg, #00D4FF, #00C48C);
+    color: var(--ocean);
+    box-shadow: 0 8px 32px rgba(0,212,255,0.35), 0 4px 0 rgba(0,0,0,0.3);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn-play:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 12px 40px rgba(0,212,255,0.45), 0 4px 0 rgba(0,0,0,0.3); }
+  .btn-play:active { transform: translateY(1px); }
+  .home-note { font-size: 0.72rem; color: rgba(255,255,255,0.35); text-align: center; max-width: 480px; line-height: 1.6; }
+
+  /* GAME */
+  #game-screen {
+    flex-direction: row; align-items: stretch;
+    padding: 14px; gap: 14px; justify-content: center;
+    padding-bottom: 62px;
+  }
+  .watch-panel {
+    width: 520px; min-width: 320px; flex-shrink: 0;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .watch-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.15rem; color: var(--cyan);
+    text-align: center; letter-spacing: 1px;
+  }
+  .watch-wrap {
+    flex: 1;
+    background: rgba(0,0,0,0.4);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 340px; padding: 14px; gap: 10px;
+  }
+  .watch-wrap.spotlight { border-color: var(--yellow); box-shadow: 0 0 24px rgba(255,224,71,0.35); }
+  #step-gif {
+    max-width: 100%; max-height: 400px;
+    object-fit: contain; border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+  }
+  #real-vid {
+    display: none; width: 100%; max-height: 400px;
+    object-fit: contain; border-radius: 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.04);
+  }
+  /* Despite tucked into the corner while he explains the step */
+  #step-vid.inset {
+    position: absolute; right: 14px; bottom: 62px;
+    width: 30%; max-width: 170px; max-height: none;
+    border: 3px solid var(--cyan); border-radius: 14px;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.45), 0 0 18px rgba(0,212,255,0.35);
+    z-index: 6; background: var(--deep);
+  }
+  .inset-tag {
+    position: absolute; right: 14px; bottom: 40px;
+    font-family: 'Fredoka One', cursive; font-size: 0.7rem;
+    color: var(--cyan); letter-spacing: 0.5px;
+    z-index: 7; display: none;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.7);
+  }
+  .inset-tag.on { display: block; }
+  .real-tag {
+    position: absolute; left: 16px; top: 14px; z-index: 6;
+    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.6px;
+    padding: 4px 11px; border-radius: 50px;
+    background: rgba(0,196,140,0.16); border: 1px solid rgba(0,196,140,0.5);
+    color: var(--mint); display: none;
+  }
+  .real-tag.on { display: block; }
+  .watch-caption {
+    font-size: 0.92rem; font-weight: 700;
+    color: rgba(255,255,255,0.7); text-align: center; line-height: 1.4;
+  }
+  .germ-banner {
+    position: absolute; inset: 0; z-index: 12;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    background: rgba(0,196,140,0.18);
+    backdrop-filter: blur(3px);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .germ-banner.show { opacity: 1; }
+  .germ-banner-emoji { font-size: 4.6rem; animation: bannerSpin 0.8s ease-out; }
+  @keyframes bannerSpin { 0% { transform: scale(0) rotate(-180deg); } 70% { transform: scale(1.25) rotate(10deg); } 100% { transform: scale(1) rotate(0); } }
+  .germ-banner-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.6rem; color: var(--yellow);
+    text-shadow: 0 0 20px rgba(255,224,71,0.7), 0 3px 0 rgba(0,0,0,0.4);
+    letter-spacing: 1px;
+  }
+  .germ-banner-sub { font-size: 0.95rem; font-weight: 800; color: var(--white); }
+
+  .germ-row { display: flex; justify-content: space-between; gap: 8px; padding: 10px 4px; }
+  .germ { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; transition: transform 0.3s; }
+  .germ.defeated .germ-face { animation: germDie 0.6s ease-out forwards; }
+  .germ.defeated .germ-name { color: var(--mint); text-decoration: line-through; }
+  @keyframes germDie {
+    0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+    40%  { transform: scale(1.3) rotate(20deg); opacity: 1; filter: brightness(2); }
+    100% { transform: scale(0) rotate(-30deg); opacity: 0; }
+  }
+  .germ-face {
+    width: 58px; height: 58px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.1rem;
+    border: 3px solid rgba(255,90,95,0.55);
+    background: rgba(255,90,95,0.15);
+    transition: all 0.3s;
+  }
+  .germ.active .germ-face {
+    border-color: var(--yellow);
+    background: rgba(255,224,71,0.2);
+    box-shadow: 0 0 20px rgba(255,224,71,0.6);
+    animation: germPulse 1s ease-in-out infinite;
+  }
+  @keyframes germPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+  .germ-name { font-size: 0.72rem; font-weight: 800; color: rgba(255,255,255,0.62); text-align: center; letter-spacing: 0.2px; line-height: 1.15; }
+
+  .center-panel {
+    flex: 1; max-width: 360px; min-width: 260px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 12px; justify-content: center;
+  }
+  .step-number-display {
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.95rem; color: rgba(255,255,255,0.5);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .bubbles-ring-wrap { position: relative; width: 172px; height: 172px; flex-shrink: 0; }
+  .lather-ring-svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+  .lather-track { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 10; }
+  .lather-fill {
+    fill: none; stroke: var(--cyan); stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 502; stroke-dashoffset: 502;
+    transition: stroke-dashoffset 0.4s cubic-bezier(.4,0,.2,1), stroke 0.3s;
+    filter: drop-shadow(0 0 8px rgba(0,212,255,0.8));
+  }
+  .lather-fill.compliant { stroke: var(--mint); }
+  .lather-fill.wrong     { stroke: var(--coral); }
+  .bubbles-char { position: absolute; inset: 16px; display: flex; align-items: center; justify-content: center; }
+  .bubbles-svg {
+    width: 100%; height: 100%;
+    animation: bubblesBob 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 16px rgba(0,212,255,0.4));
+    transition: filter 0.3s;
+  }
+  @keyframes bubblesBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  .bubbles-svg.celebrate { animation: bubblesJump 0.6s ease-out; filter: drop-shadow(0 0 30px rgba(0,212,255,0.9)); }
+  @keyframes bubblesJump { 0% { transform: translateY(0) scale(1); } 30% { transform: translateY(-20px) scale(1.15); } 60% { transform: translateY(-10px) scale(1.05); } 100% { transform: translateY(0) scale(1); } }
+  .bubbles-svg.wrong { animation: bubblesShake 0.5s ease-out; }
+  @keyframes bubblesShake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-8px); } 40%,80% { transform: translateX(8px); } }
+
+  .instruction-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 16px 22px; text-align: center; width: 100%;
+    min-height: 118px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 7px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .instruction-card.compliant { border-color: var(--mint); background: rgba(0,196,140,0.1); }
+  .instruction-card.wrong     { border-color: var(--coral); background: rgba(255,90,95,0.1); }
+  .instruction-step-name { font-family: 'Fredoka One', cursive; font-size: 1.45rem; color: var(--yellow); line-height: 1.2; }
+  .instruction-how { font-size: 0.88rem; font-weight: 600; color: rgba(255,255,255,0.8); line-height: 1.5; }
+  .instruction-feedback { font-size: 1.02rem; font-weight: 800; min-height: 1.4em; transition: color 0.3s; }
+  .instruction-feedback.ok    { color: var(--mint); }
+  .instruction-feedback.wrong { color: var(--coral); }
+  .instruction-feedback.wait  { color: rgba(255,255,255,0.5); }
+  .conf-pips { display: flex; gap: 5px; justify-content: center; }
+  .conf-pip { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.15); transition: background 0.2s, transform 0.2s; }
+  .conf-pip.lit     { background: var(--cyan); transform: scale(1.2); }
+  .conf-pip.lit-ok  { background: var(--mint); transform: scale(1.3); }
+  .conf-pip.lit-bad { background: var(--coral); }
+
+  .right-panel {
+    width: 142px; min-width: 122px;
+    display: flex; flex-direction: column;
+    gap: 12px; align-items: center; justify-content: center;
+  }
+  .side-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 14px; width: 100%; text-align: center;
+  }
+  .side-label {
+    font-size: 0.62rem; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(255,255,255,0.4);
+    margin-bottom: 6px;
+  }
+  .stars-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 3px; font-size: 1.25rem; }
+  .star { transition: transform 0.3s; }
+  .star.earned { animation: starPop 0.4s ease-out; }
+  @keyframes starPop { 0% { transform: scale(0) rotate(-20deg); } 60% { transform: scale(1.3) rotate(5deg); } 100% { transform: scale(1) rotate(0); } }
+  .timer-value { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: var(--cyan); line-height: 1; }
+  .steps-done-big { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--mint); line-height: 1; }
+  .end-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.85rem;
+    padding: 9px 16px; border: 1px solid var(--border);
+    border-radius: 50px; background: transparent; color: rgba(255,255,255,0.5);
+    cursor: pointer; transition: all 0.2s; width: 100%;
+  }
+  .end-btn:hover { border-color: var(--coral); color: var(--coral); }
+
+  /* Manual control row */
+  .manual-row {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 30;
+    display: none; align-items: center; gap: 8px;
+    padding: 9px 14px;
+    background: rgba(7,21,40,0.9);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .manual-row.on { display: flex; }
+  .man-lbl { font-size: 0.68rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.35); white-space: nowrap; }
+  .man-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.74rem;
+    padding: 7px 13px; border-radius: 50px; cursor: pointer;
+    border: 1px solid var(--border); background: rgba(0,212,255,0.08);
+    color: var(--cyan); white-space: nowrap; transition: all 0.15s;
+  }
+  .man-btn:hover { background: rgba(0,212,255,0.18); }
+  .man-btn.amber { border-color: rgba(255,224,71,0.4); background: rgba(255,224,71,0.08); color: var(--yellow); }
+  .man-btn.red   { border-color: rgba(255,90,95,0.4);  background: rgba(255,90,95,0.08);  color: var(--coral); }
+
+  /* Flash overlays */
+  .flash { position: fixed; inset: 0; z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+  .flash.show { opacity: 1; }
+  .green-f { background: radial-gradient(circle, rgba(0,196,140,0.28), transparent 70%); }
+  .red-f   { background: radial-gradient(circle, rgba(255,90,95,0.3),  transparent 70%); }
+
+  /* Wrong-step alert modal */
+  .wrong-alert {
+    position: fixed; inset: 0; z-index: 80;
+    background: rgba(11,31,58,0.85);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .wrong-alert.show { opacity: 1; pointer-events: all; }
+  .wa-box {
+    background: var(--deep);
+    border: 3px solid var(--coral);
+    border-radius: 28px;
+    padding: 30px 38px; text-align: center;
+    max-width: 420px; width: calc(100% - 48px);
+    box-shadow: 0 0 60px rgba(255,90,95,0.4);
+    animation: waPop 0.4s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes waPop { 0% { transform: scale(0.6); } 100% { transform: scale(1); } }
+  .wa-emoji { font-size: 3.2rem; animation: waWiggle 0.8s ease-in-out infinite; display: inline-block; }
+  @keyframes waWiggle { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+  .wa-title { font-family: 'Fredoka One', cursive; font-size: 1.7rem; color: var(--coral); margin: 10px 0 6px; }
+  .wa-msg { font-size: 0.95rem; font-weight: 700; color: rgba(255,255,255,0.85); line-height: 1.5; margin-bottom: 16px; }
+  .wa-close {
+    font-family: 'Fredoka One', cursive; font-size: 1rem;
+    padding: 12px 30px; border: none; border-radius: 50px; cursor: pointer;
+    background: linear-gradient(135deg, var(--coral), #FF9D00);
+    color: var(--white);
+    box-shadow: 0 6px 20px rgba(255,90,95,0.35);
+  }
+
+  /* Wrong toast */
+  #wrong-toast {
+    position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: rgba(255,90,95,0.95); color: white;
+    padding: 11px 26px; border-radius: 50px;
+    font-family: 'Fredoka One', cursive; font-size: 1.05rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 50; white-space: nowrap;
+  }
+  #wrong-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed; width: 10px; height: 10px; border-radius: 2px;
+    animation: confettiFall linear forwards;
+    z-index: 101; pointer-events: none;
+  }
+  @keyframes confettiFall {
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* SCORE screen */
+  #score-screen { gap: 14px; padding: 20px; }
+  .sc-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    color: var(--yellow); text-align: center;
+    text-shadow: 0 0 40px rgba(255,224,71,0.6);
+    animation: titlePulse 1s ease-in-out infinite;
+  }
+  @keyframes titlePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+  .sc-stars { font-size: 2.1rem; letter-spacing: 6px; }
+  .sc-ring-wrap { position: relative; width: 180px; height: 180px; }
+  .sc-inner {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .sc-num { font-family: 'Fredoka One', cursive; font-size: 3rem; color: var(--mint); line-height: 1; }
+  .sc-grade { font-family: 'Fredoka One', cursive; font-size: 0.85rem; color: var(--yellow); letter-spacing: 1px; margin-top: 4px; text-align: center; }
+  .sc-msg { font-size: 1.05rem; font-weight: 700; color: var(--white); text-align: center; max-width: 480px; line-height: 1.5; }
+  .sc-stats { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .sc-stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 12px 20px; text-align: center; min-width: 100px;
+  }
+  .sc-v { font-family: 'Fredoka One', cursive; font-size: 1.3rem; color: var(--cyan); }
+  .sc-l { font-size: 0.62rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 3px; }
+  .badges { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; max-width: 560px; }
+  .badge {
+    font-size: 0.72rem; font-weight: 800;
+    padding: 6px 12px; border-radius: 50px;
+    border: 1px solid; display: flex; align-items: center; gap: 5px;
+  }
+  .badge.ok   { border-color: rgba(0,196,140,0.5); background: rgba(0,196,140,0.12); color: var(--mint); }
+  .badge.miss { border-color: rgba(255,90,95,0.4); background: rgba(255,90,95,0.08); color: var(--coral); }
+  .sc-cd { font-size: 0.75rem; color: rgba(255,255,255,0.4); font-weight: 700; }
+  .sc-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .sc-btn {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    padding: 12px 26px; border-radius: 50px; cursor: pointer;
+    border: none; transition: transform 0.15s;
+  }
+  .sc-btn:hover { transform: scale(1.05); }
+  .sc-btn.primary { background: linear-gradient(135deg, var(--yellow), #FF9D00); color: var(--ocean); box-shadow: 0 8px 28px rgba(255,224,71,0.35); }
+  .sc-btn.ghost { background: transparent; border: 1px solid var(--border); color: var(--cyan); }
+
+  /* STICKER BOOK (history) + CHAMPIONS (leaderboard) */
+  #stickers-screen, #champs-screen { justify-content: flex-start; padding: 24px 20px 40px; gap: 16px; }
+  .page-hdr { display: flex; align-items: center; gap: 14px; width: 100%; max-width: 760px; }
+  .page-title { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--cyan); flex: 1; }
+  .clear-btn {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.72rem;
+    padding: 7px 14px; border-radius: 50px; cursor: pointer;
+    border: 1px solid rgba(255,90,95,0.4); background: transparent; color: var(--coral);
+  }
+  .sum-row { display: flex; gap: 10px; flex-wrap: wrap; width: 100%; max-width: 760px; }
+  .sum-card {
+    flex: 1; min-width: 120px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 14px; text-align: center;
+  }
+  .sum-val { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: var(--mint); }
+  .sum-lbl { font-size: 0.62rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 3px; }
+  .empty-note {
+    width: 100%; max-width: 760px; text-align: center;
+    padding: 40px 20px; color: rgba(255,255,255,0.35);
+    font-weight: 700; border: 2px dashed var(--border); border-radius: 20px;
+  }
+  .hist-table-wrap { width: 100%; max-width: 760px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    font-size: 0.62rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    color: rgba(255,255,255,0.4); text-align: left; padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  td { font-size: 0.8rem; font-weight: 700; padding: 9px 10px; border-bottom: 1px solid rgba(0,212,255,0.08); }
+  .grade-pill { font-family: 'Fredoka One', cursive; font-size: 0.66rem; padding: 3px 10px; border-radius: 50px; }
+  .gA { background: rgba(0,196,140,0.15); color: var(--mint); border: 1px solid rgba(0,196,140,0.4); }
+  .gB { background: rgba(0,212,255,0.12); color: var(--cyan); border: 1px solid var(--border); }
+  .gC { background: rgba(255,224,71,0.12); color: var(--yellow); border: 1px solid rgba(255,224,71,0.35); }
+  .gD { background: rgba(255,90,95,0.1); color: var(--coral); border: 1px solid rgba(255,90,95,0.35); }
+  .top3-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 760px; }
+  .top3-card {
+    flex: 1; min-width: 150px; max-width: 220px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 18px 14px; text-align: center;
+  }
+  .top3-card.gold   { border-color: rgba(255,224,71,0.55); box-shadow: 0 0 24px rgba(255,224,71,0.15); }
+  .top3-card.silver { border-color: rgba(255,255,255,0.35); }
+  .top3-card.bronze { border-color: rgba(255,157,0,0.4); }
+  .top3-trophy { font-size: 2rem; }
+  .top3-score { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--mint); margin-top: 4px; }
+  .top3-name { font-size: 0.75rem; font-weight: 800; color: var(--yellow); margin-top: 2px; }
+  .top3-date { font-size: 0.62rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .lead-list { width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 8px; }
+  .lead-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 10px 16px;
+  }
+  .lead-rank {
+    font-family: 'Fredoka One', cursive; font-size: 0.95rem;
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,212,255,0.1); color: var(--cyan); flex-shrink: 0;
+  }
+  .lead-rank.gold   { background: rgba(255,224,71,0.18); color: var(--yellow); }
+  .lead-rank.silver { background: rgba(255,255,255,0.14); color: var(--white); }
+  .lead-rank.bronze { background: rgba(255,157,0,0.15); color: #FF9D00; }
+  .lead-info { flex: 1; min-width: 0; }
+  .lead-name { font-size: 0.82rem; font-weight: 800; }
+  .lead-date { font-size: 0.62rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .lead-score { font-family: 'Fredoka One', cursive; font-size: 1.05rem; color: var(--mint); }
+
+  /* Settings drawer */
+  .settings-overlay {
+    position: fixed; inset: 0; z-index: 90;
+    background: rgba(0,0,0,0.5);
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .settings-overlay.open { opacity: 1; pointer-events: all; }
+  .settings-drawer {
+    position: absolute; top: 0; right: 0; bottom: 0;
+    width: 320px; max-width: 88vw;
+    background: var(--deep);
+    border-left: 1px solid var(--border);
+    padding: 20px; overflow-y: auto;
+    transform: translateX(100%); transition: transform 0.3s;
+  }
+  .settings-overlay.open .settings-drawer { transform: translateX(0); }
+  .drawer-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .drawer-title { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--cyan); }
+  .drawer-close { background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1.1rem; cursor: pointer; }
+  .drawer-section { margin-bottom: 22px; }
+  .section-title { font-size: 0.66rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+  .lang-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .lang-pill {
+    font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.76rem;
+    padding: 8px 16px; border-radius: 50px; cursor: pointer;
+    border: 1px solid var(--border); background: transparent; color: rgba(255,255,255,0.6);
+  }
+  .lang-pill.active { background: rgba(0,212,255,0.14); color: var(--cyan); }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .toggle-label { font-size: 0.85rem; font-weight: 800; }
+  .toggle-sub { font-size: 0.68rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .toggle-switch {
+    width: 44px; height: 24px; border-radius: 50px;
+    background: rgba(255,255,255,0.15); cursor: pointer;
+    padding: 3px; transition: background 0.2s; flex-shrink: 0;
+  }
+  .toggle-switch.on { background: var(--mint); }
+  .toggle-knob {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #fff; transition: transform 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-switch.on .toggle-knob { transform: translateX(20px); }
+  input[type=range] { width: 100%; accent-color: var(--cyan); }
+  .slider-labels { display: flex; justify-content: space-between; font-size: 0.66rem; color: rgba(255,255,255,0.4); font-weight: 700; margin-top: 4px; }
+  .about-logo {
+    font-family: 'Fredoka One', cursive; font-size: 1.2rem;
+    color: var(--cyan); margin-bottom: 6px;
+  }
+  .about-line { font-size: 0.72rem; color: rgba(255,255,255,0.45); line-height: 1.8; }
+  .who-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 8px; padding: 5px 12px; border-radius: 50px;
+    border: 1px solid rgba(0,196,140,0.4); background: rgba(0,196,140,0.08);
+    font-size: 0.68rem; font-weight: 800; color: var(--mint);
+  }
+
+  /* Subtitle bar for Twi mode */
+  #subtitle-bar {
+    position: fixed; bottom: 66px; left: 50%; transform: translateX(-50%);
+    max-width: 84vw;
+    background: rgba(7,21,40,0.92);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 9px 20px; border-radius: 14px;
+    font-size: 0.85rem; font-weight: 700; text-align: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    z-index: 55;
+  }
+  #subtitle-bar.show { opacity: 1; }
+
+  #cam-wrap { position:absolute; left:14px; bottom:62px; width:34%; max-width:190px; z-index:6;
+    border:3px solid var(--mint); border-radius:14px; overflow:hidden;
+    box-shadow:0 6px 22px rgba(0,0,0,0.45); background:#000; display:none; }
+  #cam-frame { width:100%; display:block; }
+  .cam-tag { position:absolute; left:4px; top:4px; font-size:0.56rem; font-weight:800;
+    background:rgba(0,196,140,0.85); color:#04202a; padding:2px 7px; border-radius:50px; }
+  .germ.escaped .germ-face { border-color:var(--coral); background:rgba(255,90,95,0.22); animation:germEscape 0.6s ease-out; }
+  @keyframes germEscape { 0%{transform:translateY(0);} 40%{transform:translateY(-10px) rotate(15deg);} 100%{transform:translateY(0) rotate(0);} }
+  .germ.escaped .germ-name { color:var(--coral); }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 900px) {
+    #game-screen { flex-direction: column; align-items: center; overflow-y: auto; justify-content: flex-start; }
+    .watch-panel { width: 100%; max-width: 520px; }
+    .right-panel { width: 100%; max-width: 430px; flex-direction: row; flex-wrap: wrap; }
+    .side-card { flex: 1; min-width: 110px; }
+    .end-btn { width: auto; flex: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-bubble, .bubbles-svg, .bubbles-hero, .germ.active .germ-face, .sc-title { animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="bg-bubbles"></div>
+<div class="flash green-f" id="flash-green"></div>
+<div class="flash red-f"   id="flash-red"></div>
+
+<!-- Top nav -->
+<div class="nav">
+  <div class="nav-logo">💧 WASH-IT KIDS</div>
+  <button class="nav-btn active" id="nav-home"     onclick="navTo('home')">Home</button>
+  <button class="nav-btn"        id="nav-stickers" onclick="navTo('stickers')">Sticker Book</button>
+  <button class="nav-btn"        id="nav-champs"   onclick="navTo('champs')">Champions</button>
+  <div class="nav-spacer"></div>
+  <button class="gear-btn" onclick="openSettings()" aria-label="Settings">⚙</button>
+</div>
+
+<!-- Settings drawer -->
+<div class="settings-overlay" id="settings-overlay" onclick="overlayClick(event)">
+  <div class="settings-drawer">
+    <div class="drawer-hdr">
+      <div class="drawer-title">Settings</div>
+      <button class="drawer-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="drawer-section">
+      <div class="section-title">Language</div>
+      <div class="lang-group">
+        <button class="lang-pill active" id="lp-en" onclick="changeLang('en',this)">English</button>
+        <button class="lang-pill"        id="lp-fr" onclick="changeLang('fr',this)">Français</button>
+        <button class="lang-pill"        id="lp-tw" onclick="changeLang('tw',this)">Asante Twi</button>
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="section-title">Voices</div>
+      <div class="toggle-row">
+        <div><div class="toggle-label">Backup browser voice</div>
+          <div class="toggle-sub">Off = only Despite's voice from the clips. Turn on only if you want the computer voice for lines Despite hasn't recorded yet.</div></div>
+        <div class="toggle-switch" id="audio-sw" onclick="toggleAudio()"><div class="toggle-knob"></div></div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:0.8rem;font-weight:800;margin-bottom:6px">Voice</div>
+        <select id="voice-select" onchange="voiceChanged()"
+                style="width:100%;padding:9px 10px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:var(--white);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.76rem;outline:none">
+        </select>
+        <div class="toggle-sub" style="margin-top:5px">Pick the most game-like voice on your device. Edge's "Ana" or "Maisie" sound best.</div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="font-size:0.8rem;font-weight:800;margin-bottom:6px">Talking speed</div>
+        <input type="range" id="rate-slider" min="0.5" max="1.3" step="0.05" value="0.85"
+               oninput="SPEECH.rate=parseFloat(this.value);updateRateLabel()"/>
+        <div class="slider-labels"><span>Slow</span><span id="rate-lbl">Normal</span><span>Fast</span></div>
+      </div>
+    </div>
+    <div class="drawer-section">
+      <div class="section-title">Hand demo speed</div>
+      <input type="range" id="real-rate" min="0.35" max="1" step="0.05" value="0.6"
+             oninput="REAL_RATE=parseFloat(this.value);applyRealRate();updateRealRateLabel()"/>
+      <div class="slider-labels"><span>Very slow</span><span id="rrate-lbl">0.60x</span><span>Normal</span></div>
+      <div class="toggle-sub" style="margin-top:6px">How fast the real hands move. Lower is easier for a child to copy.</div>
+    </div>
+    <div class="drawer-section">
+      <div class="section-title">Demo speed</div>
+      <input type="range" id="demo-speed" min="60" max="220" step="10" value="130"
+             oninput="TICK=parseInt(this.value);updateDemoSpeedLabel()"/>
+      <div class="slider-labels"><span>Very fast</span><span id="dspeed-lbl">Normal</span><span>Slow</span></div>
+    </div>
+    <div class="drawer-section">
+      <div class="section-title">About</div>
+      <div class="about-logo">WASH-IT Kids</div>
+      <div class="about-line">Handwashing game for ages 8 to 12</div>
+      <div class="about-line">Interactive demo, no camera needed</div>
+      <div class="about-line">Same visuals and flow as the live kids UI</div>
+      <div class="who-badge">✓ WHO 7-Step Protocol</div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="home-screen">
+  <div>
+    <div class="logo-title">💧 WASH-IT KIDS</div>
+    <div class="logo-sub">Beat the Germ Gang! · Interactive Demo</div>
+  </div>
+  <svg class="bubbles-hero" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="80" cy="85" r="55" fill="#00D4FF" opacity="0.15" stroke="#00D4FF" stroke-width="2"/>
+    <circle cx="80" cy="80" r="50" fill="url(#bubbles-body)"/>
+    <defs>
+      <radialGradient id="bubbles-body" cx="35%" cy="30%">
+        <stop offset="0%" stop-color="#7EEEFF"/>
+        <stop offset="100%" stop-color="#00A8CC"/>
+      </radialGradient>
+    </defs>
+    <ellipse cx="60" cy="55" rx="14" ry="9" fill="white" opacity="0.35" transform="rotate(-20,60,55)"/>
+    <circle cx="65" cy="75" r="9" fill="white"/>
+    <circle cx="95" cy="75" r="9" fill="white"/>
+    <circle cx="67" cy="76" r="5" fill="#003D52"/>
+    <circle cx="97" cy="76" r="5" fill="#003D52"/>
+    <circle cx="69" cy="74" r="2" fill="white"/>
+    <circle cx="99" cy="74" r="2" fill="white"/>
+    <path d="M62 95 Q80 112 98 95" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M34 105 Q20 140 45 150 Q80 160 115 150 Q140 140 126 105" fill="#FFE047" opacity="0.8"/>
+    <ellipse cx="22" cy="90" rx="10" ry="16" fill="#00A8CC" transform="rotate(-30,22,90)"/>
+    <ellipse cx="138" cy="90" rx="10" ry="16" fill="#00A8CC" transform="rotate(30,138,90)"/>
+  </svg>
+  <div class="home-card">
+    <h2>Ready to beat the Germ Gang?</h2>
+    <p>Wash your hands at the station and copy Despite step by step. The camera watches your hands and the germs fall as you clean!</p>
+    <input id="server-addr" type="text" value="ws://localhost:8002/ws-kids"
+           style="width:100%;margin-top:12px;padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:var(--white);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;text-align:center;outline:none"/>
+    <div class="conn-pill" id="conn-pill" style="margin-top:8px;font-size:0.78rem;font-weight:800;color:#8aa">Not connected</div>
+    <script>window.addEventListener('DOMContentLoaded',function(){try{var b=document.getElementById('server-addr');if(b)b.value=defaultWsUrl();}catch(e){}});</script>
+  </div>
+  <button class="btn-play" onclick="connectLive()">▶ Let's Go!</button>
+  <div class="home-note">Connects to the WASH-IT camera station · show both hands to begin</div>
+</div>
+
+<!-- GAME -->
+<div class="screen hidden" id="game-screen">
+  <div class="watch-panel">
+    <div class="watch-label">👀 Copy These Hands!</div>
+    <div id="audio-diag" style="text-align:center;font-size:0.62rem;color:rgba(255,255,255,0.4);font-weight:700;min-height:0.9em">audio idle</div>
+    <div class="watch-wrap" id="watch-wrap">
+      <img id="step-gif" src="" alt="Step demonstration"/>
+      <video id="step-vid" playsinline preload="auto"
+             style="display:none;width:100%;max-height:400px;object-fit:contain;border-radius:14px;border:1px solid var(--border);background:rgba(255,255,255,0.04)"></video>
+      <video id="real-vid" playsinline preload="auto" muted loop></video>
+      <div class="real-tag" id="real-tag">REAL HANDS &middot; SLOW &middot; COPY THIS</div>
+      <div id="cam-wrap"><div class="cam-tag">YOUR HANDS</div><img id="cam-frame" alt="camera"/></div>
+      <div class="inset-tag" id="inset-tag">Despite</div>
+      <div class="watch-caption" id="watch-caption"></div>
+      <div class="germ-banner" id="germ-banner">
+        <div class="germ-banner-emoji" id="gb-emoji">🦠</div>
+        <div class="germ-banner-title">GERM DEFEATED!</div>
+        <div class="germ-banner-sub" id="gb-sub">Palm Pete is gone!</div>
+      </div>
+    </div>
+    <div class="germ-row" id="germ-row"></div>
+  </div>
+
+  <div class="center-panel">
+    <div class="step-number-display" id="step-num-display">Step 1 of 7</div>
+    <div class="bubbles-ring-wrap">
+      <svg class="lather-ring-svg" viewBox="0 0 180 180">
+        <circle class="lather-track" cx="90" cy="90" r="80"/>
+        <circle class="lather-fill" id="lather-arc" cx="90" cy="90" r="80"/>
+      </svg>
+      <div class="bubbles-char">
+        <svg class="bubbles-svg" id="bubbles-char" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="bb" cx="35%" cy="30%">
+              <stop offset="0%" stop-color="#7EEEFF"/>
+              <stop offset="100%" stop-color="#00A8CC"/>
+            </radialGradient>
+          </defs>
+          <circle cx="60" cy="60" r="48" fill="url(#bb)"/>
+          <ellipse cx="44" cy="42" rx="11" ry="7" fill="white" opacity="0.35" transform="rotate(-20,44,42)"/>
+          <circle cx="47" cy="58" r="8" fill="white"/>
+          <circle cx="73" cy="58" r="8" fill="white"/>
+          <circle id="eye-l" cx="49" cy="59" r="5" fill="#003D52"/>
+          <circle id="eye-r" cx="75" cy="59" r="5" fill="#003D52"/>
+          <circle cx="51" cy="57" r="1.8" fill="white"/>
+          <circle cx="77" cy="57" r="1.8" fill="white"/>
+          <path id="bubbles-mouth" d="M46 74 Q60 86 74 74" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M14 80 Q6 105 22 112 Q60 122 98 112 Q114 105 106 80" fill="#FFE047" opacity="0.85"/>
+          <ellipse cx="12" cy="68" rx="8" ry="13" fill="#00A8CC" transform="rotate(-25,12,68)"/>
+          <ellipse cx="108" cy="68" rx="8" ry="13" fill="#00A8CC" transform="rotate(25,108,68)"/>
+        </svg>
+      </div>
+    </div>
+    <div class="instruction-card" id="instruction-card">
+      <div class="instruction-step-name" id="inst-step-name">Loading...</div>
+      <div class="instruction-how" id="inst-how"></div>
+      <div class="instruction-feedback wait" id="inst-feedback">Get ready...</div>
+      <div class="conf-pips" id="conf-pips"></div>
+    </div>
+  </div>
+
+  <div class="right-panel">
+    <div class="side-card">
+      <div class="side-label">Stars Earned</div>
+      <div class="stars-row" id="stars-row"></div>
+    </div>
+    <div class="side-card">
+      <div class="side-label">Time</div>
+      <div class="timer-value" id="timer-val">0:00</div>
+    </div>
+    <div class="side-card">
+      <div class="steps-done-big" id="steps-done-big">0</div>
+      <div class="side-label" style="margin:4px 0 0">Germs Beaten</div>
+    </div>
+    <button class="end-btn" onclick="endDemo()">✕ Quit</button>
+  </div>
+</div>
+
+<!-- Manual controls -->
+<div class="manual-row" id="manual-row">
+  <div class="man-lbl">Manual:</div>
+  <button class="man-btn"       onclick="manBeatGerm()">✓ Beat this germ</button>
+  <button class="man-btn amber" onclick="manMistake()">⚠ Show a mistake</button>
+  <button class="man-btn red"   onclick="manWrongAlert()">✗ Wrong-step alert</button>
+  <button class="man-btn"       onclick="manSkip()">⏭ Skip germ</button>
+  <button class="man-btn"       onclick="manFinish()">⏩ Jump to finish</button>
+  <button class="man-btn red"   onclick="endDemo()">✕ End</button>
+</div>
+
+<!-- Wrong-step modal -->
+<div class="wrong-alert" id="wrong-alert">
+  <div class="wa-box">
+    <div class="wa-emoji" id="wa-emoji">🦠</div>
+    <div class="wa-title">Whoops! Wrong move!</div>
+    <div class="wa-msg" id="wa-msg">That germ is still hiding! Look at the hands video and copy it.</div>
+    <button class="wa-close" onclick="closeWrongAlert()">Got it, let me try!</button>
+  </div>
+</div>
+
+<!-- SCORE -->
+<div class="screen hidden" id="score-screen">
+  <div class="sc-title">🎉 YOU DID IT! 🎉</div>
+  <div class="sc-stars" id="sc-stars">⭐⭐⭐⭐⭐⭐⭐</div>
+  <div class="sc-ring-wrap">
+    <svg viewBox="0 0 190 190" width="180" height="180">
+      <defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#00D4FF"/><stop offset="100%" stop-color="#00C48C"/>
+      </linearGradient></defs>
+      <circle cx="95" cy="95" r="82" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="11"/>
+      <circle id="sarc" cx="95" cy="95" r="82" fill="none" stroke="url(#sg)" stroke-width="11"
+              stroke-linecap="round" stroke-dasharray="515" stroke-dashoffset="515"
+              style="transition:stroke-dashoffset 1.8s cubic-bezier(.4,0,.2,1)"/>
+    </svg>
+    <div class="sc-inner">
+      <div class="sc-num" id="sc-num">0</div>
+      <div class="sc-grade" id="sc-grade">...</div>
+    </div>
+  </div>
+  <div class="sc-msg" id="sc-msg">Counting your germ power...</div>
+  <div class="sc-stats">
+    <div class="sc-stat"><div class="sc-v" id="st-germs">0/7</div><div class="sc-l">Germs beaten</div></div>
+    <div class="sc-stat"><div class="sc-v" id="st-time">0s</div><div class="sc-l">Time</div></div>
+    <div class="sc-stat"><div class="sc-v" id="st-order">...</div><div class="sc-l">Order</div></div>
+  </div>
+  <div class="badges" id="sc-badges"></div>
+  <div class="sc-cd" id="sc-cd">Back to home in 12s...</div>
+  <div class="sc-btns">
+    <button class="sc-btn primary" onclick="resetDemo()">🏠 Play Again</button>
+    <button class="sc-btn ghost" onclick="navTo('stickers')">📖 Sticker Book</button>
+    <button class="sc-btn ghost" onclick="navTo('champs')">🏆 Champions</button>
+  </div>
+</div>
+
+<!-- STICKER BOOK (history) -->
+<div class="screen hidden" id="stickers-screen">
+  <div class="page-hdr">
+    <div class="page-title">📖 My Sticker Book</div>
+    <button class="clear-btn" onclick="clearHistory()">Clear all</button>
+  </div>
+  <div class="sum-row" id="hist-summary"></div>
+  <div class="empty-note" id="hist-empty">No games yet. Play the demo to earn your first stickers!</div>
+  <div class="hist-table-wrap">
+    <table id="hist-table" style="display:none">
+      <thead><tr><th>#</th><th>When</th><th>Germs</th><th>Time</th><th>Score</th><th>Rank</th><th>Order</th></tr></thead>
+      <tbody id="hist-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CHAMPIONS (leaderboard) -->
+<div class="screen hidden" id="champs-screen">
+  <div class="page-hdr">
+    <div class="page-title">🏆 Germ-Busting Champions</div>
+    <button class="clear-btn" onclick="clearHistory(true)">Clear all</button>
+  </div>
+  <div class="top3-row" id="top3-row"></div>
+  <div class="lead-list" id="lead-list"></div>
+  <div class="empty-note" id="lead-empty">No champions yet. Play the demo to claim the trophy!</div>
+</div>
+
+<div id="wrong-toast">🦠 Not quite! Try again!</div>
+<div id="subtitle-bar"></div>
+
+<script>
+/* ================================================================
+   WASH-IT KIDS - STANDALONE INTERACTIVE DEMO
+   Plays a complete simulated session: no server, no camera.
+   Visuals match kids.html one-to-one; pacing and completeness
+   match the compliance-mode demo (WASHIT_DEMO_V3).
+================================================================ */
+
+/* -- Step data (GIFs embedded from the real WHO step videos) -- */
+const STEPS = [
+  { name:"Rub Your Palms",        emoji:"🦠", germName:"Palm Pete",   how:"Rub both palms together in circles with soap.",
+    caption:"Copy these hands: palm circles", gif:"", video:"kids_media/despite_step1.mp4" },
+  { name:"Scrub Your Knuckles",   emoji:"👹", germName:"Knuckle Ned", how:"Put one hand on the back of the other and rub.",
+    caption:"Copy these hands: backs of hands", gif:"", video:"kids_media/despite_step2.mp4" },
+  { name:"Clean Between Fingers", emoji:"🐛", germName:"Finger Fred", how:"Lace your fingers together and slide them apart.",
+    caption:"Copy these hands: between the fingers", gif:"", video:"kids_media/despite_step3.mp4" },
+  { name:"Scrub Finger Backs",    emoji:"👾", germName:"Backy Ben",   how:"Cup one hand's knuckles into the other palm.",
+    caption:"Copy these hands: finger backs", gif:"", video:"kids_media/despite_step4.mp4" },
+  { name:"Wash Your Thumbs",      emoji:"🦹", germName:"Thumbo",      how:"Wrap your hand around the other thumb and twist.",
+    caption:"Copy these hands: thumb twists", gif:"", video:"kids_media/despite_step5.mp4" },
+  { name:"Clean Your Fingertips", emoji:"🧟", germName:"Tippy Tim",   how:"Rub fingertip circles into the opposite palm.",
+    caption:"Copy these hands: fingertip circles", gif:"", video:"kids_media/despite_step6.mp4" },
+  { name:"Scrub Your Wrists",     emoji:"🐉", germName:"Wrist King",  how:"Grab and rub around each wrist with the other hand.",
+    caption:"Copy these hands: wrist scrubs", gif:"", video:"kids_media/despite_step7.mp4" },
+];
+
+/* Intro clips that play before Step 1 (real AI-guide videos) */
+const PRELUDE = [
+  { title:"Meet Despite!", how:"Your handwashing guide says hello.",
+    caption:"Say hi to Despite!", video:"kids_media/despite_welcome.mp4" },
+  { title:"Wet Hands & Soap", how:"Wet your hands with clean water, then rub the soap until you see bubbles.",
+    caption:"Water first, then soap!", video:"kids_media/despite_soap.mp4" },
+];
+
+/* Playback speed for the real demonstration clips. The dataset footage is
+   filmed at adult speed, which is too fast for an 8 to 12 year old to copy,
+   so it is slowed down. Adjustable live in Settings. */
+var REAL_RATE = 0.6;
+
+/* Real human handwashing gestures from the project dataset.
+   These are what the child copies; Despite's own hand motion is never
+   used for teaching because a generated gesture can be subtly wrong. */
+const REAL_STEPS = ["kids_media/real_step1.mp4","kids_media/real_step2.mp4","kids_media/real_step3.mp4","kids_media/real_step4.mp4",
+                    "kids_media/real_step5.mp4","kids_media/real_step6.mp4","kids_media/real_step7.mp4"];
+
+/* Plays after the last germ is defeated, before the score screen */
+const RINSE = { title:"Rinse Off!", how:"Rinse all the soap away with clean water, then turn off the tap without touching it.",
+  caption:"Wash the germs down the drain!", gif:"", video:"kids_media/despite_rinse.mp4" };
+
+const WRONG_MSGS = [
+  "Oops! Follow the picture!",
+  "Not quite, look at the step!",
+  "Keep trying, you're close!",
+  "Wrong step! Try again!",
+  "Almost! Check your hands!",
+];
+
+const GRADES = [
+  { min: 95, key:'A+', title:'GERM CHAMPION' },
+  { min: 85, key:'A',  title:'GERM BUSTER' },
+  { min: 75, key:'B',  title:'BUBBLE HERO' },
+  { min: 65, key:'C',  title:'GOOD TRY' },
+  { min: 0,  key:'D',  title:'KEEP TRAINING' },
+];
+
+/* -- Multilingual voice lines (FR and Twi step text reused from the
+      compliance demo so wording stays consistent across both demos) -- */
+const LANG_DATA = {
+  'en': {
+    label:'English', langCode:'en-GB', twi_mode:false,
+    welcome: "Hi, I'm Bubbles! The Germ Gang is hiding on your hands. Watch the hand videos, copy them, and we'll wash those germs away, one step at a time!",
+    stepIntro: function(n, name, germ, instr){ return 'Step '+n+'. '+name+'. '+germ+' is hiding here! '+instr; },
+    stepDone: function(germ){ return 'Yes! You beat '+germ+'! Amazing scrubbing!'; },
+    keepGoing: "Keep scrubbing, you're doing great!",
+    corrective: function(instr){ return "Hmm, that's not quite it. Try this: "+instr; },
+    wrongAlert: function(name){ return 'Whoops! Wrong move! Look at the video and copy '+name+'.'; },
+    at20s: '20 seconds of scrubbing. Great job, keep going!',
+    at40s: '40 seconds! Doctors say 40 to 60 seconds makes hands super clean. Almost there!',
+    at60s: '60 seconds! Wow, that is champion-level washing!',
+    scoreMsg: function(score, title){ return 'All done! Your germ power score is '+score+' out of 100. You are a '+title+'!'; },
+    audioOn: 'Bubbles is ready to talk!',
+    steps: STEPS.map(function(s){ return s.how; }),
+    stepNames: STEPS.map(function(s){ return s.name; }),
+  },
+  'fr': {
+    label:'Français', langCode:'fr-FR', twi_mode:false,
+    welcome: "Salut, je suis Bubbles! Les microbes se cachent sur tes mains. Regarde les vidéos, copie-les, et lavons-les, une étape à la fois!",
+    stepIntro: function(n, name, germ, instr){ return 'Étape '+n+'. '+name+'. '+germ+' se cache ici! '+instr; },
+    stepDone: function(germ){ return 'Oui! Tu as battu '+germ+'! Bravo!'; },
+    keepGoing: 'Continue de frotter, tu es super!',
+    corrective: function(instr){ return "Hmm, pas tout à fait. Essaie: "+instr; },
+    wrongAlert: function(name){ return 'Oups! Mauvais geste! Regarde la vidéo et copie '+name+'.'; },
+    at20s: '20 secondes. Bonne progression, continue!',
+    at40s: "40 secondes. L'OMS recommande 40 à 60 secondes. Presque fini!",
+    at60s: '60 secondes! Lavage de champion!',
+    scoreMsg: function(score, title){ return 'Terminé! Ton score est '+score+' sur 100. Tu es un '+title+'!'; },
+    audioOn: 'Audio activé.',
+    steps: [
+      'Frottez vos paumes ensemble en mouvements circulaires.',
+      'Placez la paume droite sur le dos de la main gauche, doigts écartés.',
+      'Entrecroisez les doigts et frottez entre eux soigneusement.',
+      'Pliez les doigts et frottez leurs dos contre la paume opposée.',
+      'Serrez votre pouce et faites-le tourner dans votre autre main.',
+      'Pressez le bout des doigts sur la paume opposée et tournez en cercles.',
+      'Saisissez votre poignet et faites tourner votre main pour le nettoyer.'
+    ],
+    stepNames: ['Paume à Paume','Dos des Mains','Doigts Entrelacés','Dos des Doigts','Rotation du Pouce','Nettoyage des Bouts','Poignet'],
+  },
+  'tw': {
+    label:'Asante Twi', langCode:'en-GB', twi_mode:true,
+    welcome: 'Akwaaba WASH-IT mu. Mesrɛ wo, hwehwɛ wo nsa. Di nkyinkyim a wohunu wɔ screen no so.',
+    stepIntro: function(n, name, germ, instr){ return 'Nkyinkyim '+n+'. '+name+'. '+instr; },
+    stepDone: function(germ){ return germ+' wie. Wo ayɛ ade pa!'; },
+    keepGoing: 'Kɔ so yie!',
+    corrective: function(instr){ return instr; },
+    wrongAlert: function(name){ return 'Nkyinkyim foforo a enye! '+name; },
+    at20s: 'Sɛkɛnd aduonu. Kɔ so yie.',
+    at40s: 'Sɛkɛnd aduanan. WHO ka sɛ sɛkɛnd aduanan nsi aduosia. Bɛwie ntɛm.',
+    at60s: 'Sɛkɛnd aduosia. Wo ayɛ ade papa paa.',
+    scoreMsg: function(score, title){ return 'Nkyinkyim wie. Wo score ne '+score+' wɔ 100 mu. '+title+'!'; },
+    audioOn: 'Asɛm no hyɛ mu.',
+    steps: [
+      'Bɔ wo nsa tumi ano ano na yi ho yie.',
+      'De wo nsa nifa tumi to wo benkum nsa akyi so.',
+      'Fa wo nsa nsateaa hyia hyia na yi ho yie.',
+      'Bɔ wo nsateaa akyi wɔ wo nsa foforɔ ano so.',
+      'De wo nsa bɔ kookoo na yi ho yie.',
+      'Hwie wo nsateaa ano wɔ wo nsa foforɔ ano so na twitwi ho.',
+      'De wo nsa kyekyere wo nsa ano na twitwi ho.'
+    ],
+    stepNames: ['Ano to Ano','Nsa Akyi','Nsateaa Hyia','Nsateaa Akyi','Kookoo Twitwi','Nsateaa Ano','Nsa Ano'],
+  }
+};
+
+var CURRENT_LANG = 'en';
+function L(){ return LANG_DATA[CURRENT_LANG]; }
+
+/* -- Voice engine (kid-pitched) -- */
+/* -- Despite's recorded voice lines --
+   Keys map UI moments to audio clips of Despite's voice. Empty entries
+   fall back to silence (or the backup browser voice if enabled in
+   Settings). Fill these with data URIs when the recordings are ready. */
+/* recorded line lengths (ms) so the germ banner holds until Despite finishes */
+const LINE_MS = { germ_1:9952, germ_2:9926, germ_3:9822, germ_4:9848,
+  germ_5:9874, germ_6:9952, germ_7:8960, wrong_try:8437, wrong_alert:9613 };
+
+const DESPITE_AUDIO = {
+  "germ_1": "kids_media/germ_1.mp3",
+  "germ_2": "kids_media/germ_2.mp3",
+  "germ_3": "kids_media/germ_3.mp3",
+  "germ_4": "kids_media/germ_4.mp3",
+  "germ_5": "kids_media/germ_5.mp3",
+  "germ_6": "kids_media/germ_6.mp3",
+  "germ_7": "kids_media/germ_7.mp3",
+  "wrong_try": "kids_media/wrong_try.mp3",
+  "wrong_alert": "kids_media/wrong_alert.mp3",
+  "sec60": "kids_media/sec60.mp3",
+  "score_perfect": "kids_media/score_perfect.mp3",
+  "score_partial": "kids_media/score_partial.mp3"
+};
+var lineAudio = null;
+function lineIsPlaying(){ return !!(lineAudio && !lineAudio.paused && !lineAudio.ended); }
+function clipIsSpeaking(){
+  var v = document.getElementById('step-vid');
+  return !!(v && v.src && !v.paused && !v.ended && !v.muted);
+}
+function sayDespite(key, text, priority){
+  if(!priority && (lineIsPlaying() || clipIsSpeaking())) return;
+  var srcA0 = DESPITE_AUDIO[key];
+  if(srcA0){
+    if(priority && lineAudio){ try{ lineAudio.pause(); }catch(e){} }
+    lineAudio = new Audio(srcA0);
+    lineAudio.volume = 1;
+    lineAudio.onerror = function(){ if(SPEECH.enabled) speak(text, priority); };
+    var lp = lineAudio.play();
+    if(lp && lp.catch){ lp.catch(function(){ if(SPEECH.enabled) speak(text, priority); }); }
+    showSubtitle(text);
+    return;
+  }
+  var srcA = DESPITE_AUDIO[key];
+  if(srcA){
+    if(priority && lineAudio){ try{ lineAudio.pause(); }catch(e){} }
+    lineAudio = new Audio(srcA);
+    lineAudio.volume = 1;
+    lineAudio.play().catch(function(){});
+    showSubtitle(text);
+  } else if(SPEECH.enabled){
+    speak(text, priority);
+  }
+}
+function stopLineAudio(){ if(lineAudio){ try{ lineAudio.pause(); }catch(e){} lineAudio = null; } }
+
+const SPEECH = {
+  enabled: true, rate: 0.9, pitch: 1.25, volume: 1.0,
+  chosenVoiceName: null,   /* set by the voice picker in Settings */
+
+  /* Rank available voices for a fun, game-like read. Child voices first
+     (Edge ships "Ana" and "Maisie"), then modern neural voices, then
+     Google voices, then anything matching the language. */
+  rankVoices: function(){
+    var lc = L().langCode, base = lc.split('-')[0];
+    var voices = (window.speechSynthesis ? window.speechSynthesis.getVoices() : [])
+      .filter(function(v){ return v.lang.indexOf(base) === 0; });
+    function score(v){
+      var n = v.name.toLowerCase(), s = 0;
+      if(/ana|maisie|kid|child|junior/.test(n)) s += 40;
+      if(/natural|online|neural/.test(n))       s += 20;
+      if(/google/.test(n))                      s += 10;
+      if(v.lang === lc)                         s += 5;
+      return s;
+    }
+    return voices.sort(function(a,b){ return score(b)-score(a); });
+  },
+  pickVoice: function(){
+    var ranked = this.rankVoices();
+    if(this.chosenVoiceName){
+      var chosen = ranked.find(function(v){ return v.name === SPEECH.chosenVoiceName; });
+      if(chosen) return chosen;
+    }
+    return ranked[0] || null;
+  },
+  say: function(text, priority){
+    if(!this.enabled || !window.speechSynthesis) return;
+    if(priority) window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate = this.rate; u.pitch = this.pitch; u.volume = this.volume;
+    u.lang = L().langCode;
+    var v = this.pickVoice();
+    if(v) u.voice = v;
+    window.speechSynthesis.speak(u);
+  },
+  stop: function(){ if(window.speechSynthesis) window.speechSynthesis.cancel(); }
+};
+
+/* Voice picker: lists every voice on this device for the current
+   language, best matches first, so you can audition and lock one in. */
+function populateVoices(){
+  var sel = document.getElementById('voice-select');
+  if(!sel || !window.speechSynthesis) return;
+  var ranked = SPEECH.rankVoices();
+  sel.innerHTML = '';
+  if(ranked.length === 0){
+    var o = document.createElement('option');
+    o.textContent = 'No voices found on this device';
+    sel.appendChild(o);
+    return;
+  }
+  ranked.forEach(function(v,i){
+    var o = document.createElement('option');
+    o.value = v.name;
+    o.textContent = v.name + (i===0 ? '  (best match)' : '');
+    sel.appendChild(o);
+  });
+  var current = SPEECH.pickVoice();
+  if(current) sel.value = current.name;
+}
+function voiceChanged(){
+  var sel = document.getElementById('voice-select');
+  SPEECH.chosenVoiceName = sel.value;
+  speak(L().audioOn, true);
+}
+if(window.speechSynthesis){
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = populateVoices;
+  setTimeout(populateVoices, 400);
+}
+
+/* Subtitle bar (used in Twi mode, like the compliance demo) */
+function showSubtitle(text){
+  var bar = document.getElementById('subtitle-bar');
+  if(!bar) return;
+  if(L().twi_mode){
+    bar.textContent = text;
+    bar.classList.add('show');
+    clearTimeout(showSubtitle._t);
+    showSubtitle._t = setTimeout(function(){ bar.classList.remove('show'); }, 5000);
+  } else {
+    bar.classList.remove('show');
+  }
+}
+showSubtitle._t = null;
+
+function speak(text, priority){ SPEECH.say(text, priority); showSubtitle(text); }
+
+/* -- Safe localStorage (works when opened as a plain file) -- */
+function loadHistory(){
+  try { return JSON.parse(localStorage.getItem('washit_kids_history') || '[]'); }
+  catch(e){ return []; }
+}
+function saveHistory(h){
+  try { localStorage.setItem('washit_kids_history', JSON.stringify(h)); } catch(e){}
+}
+var history_ = loadHistory();
+
+/* -- Global state -- */
+var TICK = 130;
+var demoInt = null, timerInt = null, cdInt = null, wrongToastTimer = null, waAutoTimer = null;
+var sessionStart = 0, currentStep = 0, stars = 0;
+var stepsCompleted = [];
+var milestonesHit = {};
+var demoRunning = false, demoPaused = false;
+
+/* Phase machine */
+var phase = 'idle';      /* welcome | soap | intro | wash | wrong | celebrate | rinse | finale */
+var phaseT = 0;          /* ticks inside the current phase */
+var phaseStart = 0;      /* wall-clock start of the phase, for real-time holds */
+var attempt = 1;         /* which try at the current step */
+var keepGoingSaid = false;
+var progress = 0;        /* lather ring fill 0..1 */
+
+
+/* -- Background bubbles -- */
+(function buildBubbles(){
+  var container = document.getElementById('bg-bubbles');
+  for(var i=0;i<14;i++){
+    var d = document.createElement('div');
+    d.className = 'bg-bubble';
+    var sz = 20 + Math.random()*70;
+    d.style.cssText = 'width:'+sz+'px;height:'+sz+'px;left:'+(Math.random()*100)+'%;'
+      + 'animation-duration:'+(8+Math.random()*14)+'s;animation-delay:'+(Math.random()*10)+'s;';
+    container.appendChild(d);
+  }
+})();
+
+/* -- Builders -- */
+function buildGermRow(){
+  var row = document.getElementById('germ-row');
+  row.innerHTML = '';
+  STEPS.forEach(function(s,i){
+    var el = document.createElement('div');
+    el.className = 'germ' + (i===0 ? ' active' : '');
+    el.id = 'germ-'+i;
+    el.innerHTML = '<div class="germ-face">'+s.emoji+'</div><div class="germ-name">'+s.germName+'</div>';
+    row.appendChild(el);
+  });
+}
+function buildPips(){
+  var row = document.getElementById('conf-pips');
+  row.innerHTML = '';
+  for(var i=0;i<8;i++){
+    var d = document.createElement('div');
+    d.className = 'conf-pip'; d.id = 'pip-'+i;
+    row.appendChild(d);
+  }
+}
+function buildStars(){
+  var row = document.getElementById('stars-row');
+  row.innerHTML = '';
+  for(var i=0;i<7;i++){
+    var d = document.createElement('div');
+    d.className = 'star'; d.id = 'star-'+i; d.textContent = '☆';
+    row.appendChild(d);
+  }
+}
+
+/* -- UI updaters (identical behavior to kids.html) -- */
+function setLatherRing(fraction, state){
+  var arc = document.getElementById('lather-arc');
+  var c = 2*Math.PI*80;
+  arc.style.strokeDashoffset = c * (1 - Math.min(1, fraction));
+  arc.setAttribute('class', 'lather-fill' + (state==='ok' ? ' compliant' : state==='wrong' ? ' wrong' : ''));
+}
+function setPips(conf, isCompliant){
+  var lit = Math.round(conf*8);
+  for(var i=0;i<8;i++){
+    var pip = document.getElementById('pip-'+i);
+    if(!pip) continue;
+    if(i<lit) pip.className = 'conf-pip ' + (isCompliant ? 'lit-ok' : conf<0.5 ? 'lit-bad' : 'lit');
+    else pip.className = 'conf-pip';
+  }
+}
+function bubblesExpression(state){
+  var char_ = document.getElementById('bubbles-char');
+  var mouth = document.getElementById('bubbles-mouth');
+  char_.classList.remove('celebrate','wrong');
+  if(state==='ok'){
+    if(mouth) mouth.setAttribute('d','M42 74 Q60 92 78 74');
+    char_.classList.add('celebrate');
+  } else if(state==='wrong'){
+    if(mouth) mouth.setAttribute('d','M48 80 Q60 72 72 80');
+    char_.classList.add('wrong');
+  } else {
+    if(mouth) mouth.setAttribute('d','M46 74 Q60 86 74 74');
+  }
+}
+function setStep(idx){
+  currentStep = idx;
+  var step = STEPS[idx];
+  var names = L().stepNames || STEPS.map(function(s){return s.name;});
+  var hows  = L().steps     || STEPS.map(function(s){return s.how;});
+  document.getElementById('step-num-display').textContent = 'Step '+(idx+1)+' of 7';
+  document.getElementById('inst-step-name').textContent = names[idx];
+  document.getElementById('inst-how').textContent = hows[idx];
+  document.getElementById('inst-feedback').textContent = 'Watch how it\'s done!';
+  document.getElementById('inst-feedback').className = 'instruction-feedback wait';
+  document.getElementById('instruction-card').className = 'instruction-card';
+  document.getElementById('watch-caption').textContent = step.caption;
+  setLatherRing(0,'');
+  setPips(0,false);
+  STEPS.forEach(function(_,i){
+    var g = document.getElementById('germ-'+i);
+    if(!g) return;
+    if(stepsCompleted.indexOf(i)>=0){ g.className = 'germ defeated'; return; }
+    g.className = 'germ' + (i===idx ? ' active' : '');
+  });
+}
+function earnStar(stepIdx){
+  stars++;
+  var star = document.getElementById('star-'+stepIdx);
+  if(star){ star.textContent = '⭐'; star.classList.add('earned'); }
+}
+function defeatGerm(stepIdx){
+  var g = document.getElementById('germ-'+stepIdx);
+  if(g) g.classList.add('defeated');
+  earnStar(stepIdx);
+  spawnDefeatParticles(g);
+}
+function spawnDefeatParticles(germEl){
+  if(!germEl) return;
+  var colors = ['#00D4FF','#FFE047','#00C48C','#FFFFFF'];
+  var rect = germEl.getBoundingClientRect();
+  for(var i=0;i<14;i++){
+    var p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.cssText = 'left:'+(rect.left+rect.width/2)+'px;top:'+(rect.top+rect.height/2)+'px;'
+      + 'background:'+colors[Math.floor(Math.random()*colors.length)]+';'
+      + 'width:'+(6+Math.random()*8)+'px;height:'+(6+Math.random()*8)+'px;'
+      + 'animation-duration:'+(0.8+Math.random()*0.6)+'s;animation-delay:'+(Math.random()*0.2)+'s;'
+      + 'transform:translateX('+((Math.random()-0.5)*80)+'px);';
+    document.body.appendChild(p);
+    (function(el){ setTimeout(function(){ el.remove(); }, 1600); })(p);
+  }
+}
+function showWrongToast(){
+  var msg = WRONG_MSGS[Math.floor(Math.random()*WRONG_MSGS.length)];
+  var toast = document.getElementById('wrong-toast');
+  toast.textContent = '🦠 ' + msg;
+  toast.classList.add('show');
+  clearTimeout(wrongToastTimer);
+  wrongToastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2400);
+}
+function doFlash(type){
+  var el = document.getElementById('flash-'+type);
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 320);
+}
+function showGermBanner(stepIdx){
+  var names = L().stepNames || STEPS.map(function(s){return s.name;});
+  document.getElementById('gb-emoji').textContent = STEPS[stepIdx].emoji;
+  document.getElementById('gb-sub').textContent = STEPS[stepIdx].germName + ' is gone!';
+  document.getElementById('germ-banner').classList.add('show');
+}
+function hideGermBanner(){
+  document.getElementById('germ-banner').classList.remove('show');
+}
+function setSpotlight(on){
+  document.getElementById('watch-wrap').classList.toggle('spotlight', !!on);
+}
+function feedback(text, cls, cardCls){
+  var fb = document.getElementById('inst-feedback');
+  fb.textContent = text;
+  fb.className = 'instruction-feedback ' + (cls || 'wait');
+  document.getElementById('instruction-card').className = 'instruction-card' + (cardCls ? ' '+cardCls : '');
+}
+
+/* -- Timer with voice milestones (20 / 40 / 60s, like the compliance demo) -- */
+function startTimer(){
+  sessionStart = Date.now();
+  milestonesHit = {};
+  clearInterval(timerInt);
+  timerInt = setInterval(function(){
+    var e = Math.floor((Date.now()-sessionStart)/1000);
+    var m = Math.floor(e/60), s = e%60;
+    document.getElementById('timer-val').textContent = m+':'+String(s).padStart(2,'0');
+    /* sec20 and sec40 are disabled: they collided with Despite's step clips */
+    [60].forEach(function(ms){
+      if(e===ms && !milestonesHit[ms]){
+        milestonesHit[ms] = true;
+        sayDespite('sec60', L().at60s, false);
+      }
+    });
+  }, 500);
+}
+
+/* ================================================================
+   DEMO ENGINE
+   Every step runs the full lifecycle:
+     INTRO      Bubbles announces the step, video spotlight, voice
+     WATCH      "waiting for hands", pips flicker low
+     WRONG      (scripted on steps 2 and 4) mistake, coral ring,
+                worried Bubbles, toast; step 4 also fires the big
+                wrong-step alert and pauses until it closes
+     BUILD      compliant scrubbing, ring fills, green pips, cheers
+     CELEBRATE  the full after-step sequence, held so you can see it:
+                green flash, germ death + particles, star pop,
+                Bubbles victory jump, GERM DEFEATED banner, voice
+   After step 7's celebration: confetti, then the score screen.
+================================================================ */
+/* -- Panel media: swaps between GIF and real video clips -- */
+var videoIntroDone = false;
+function panelVideoEl(){ return document.getElementById('step-vid'); }
+function realVideoEl(){ return document.getElementById('real-vid'); }
+function applyRealRate(){
+  var rv = document.getElementById('real-vid');
+  if(rv){ try { rv.playbackRate = REAL_RATE; } catch(e){} }
+}
+
+/* Show the real human demonstration for a step, looping silently */
+function showRealStep(idx){
+  var rv = realVideoEl();
+  var img = document.getElementById('step-gif');
+  if(img) img.style.display = 'none';
+  if(rv.dataset.idx !== String(idx)){
+    rv.dataset.idx = String(idx);
+    rv.src = REAL_STEPS[idx];
+  }
+  rv.style.display = 'block';
+  rv.muted = true; rv.loop = true;
+  applyRealRate();
+  rv.play().catch(function(){});
+  applyRealRate();                 /* some browsers reset it on play */
+  rv.onloadeddata = applyRealRate;
+  document.getElementById('real-tag').classList.add('on');
+}
+function hideRealStep(){
+  var rv = realVideoEl();
+  rv.pause();
+  rv.style.display = 'none';
+  document.getElementById('real-tag').classList.remove('on');
+}
+/* Put Despite in the corner (true) or give him the whole panel (false) */
+function setDespiteInset(on){
+  var v = panelVideoEl();
+  v.classList.toggle('inset', !!on);
+  document.getElementById('inset-tag').classList.toggle('on', !!on);
+}
+function setPanelMedia(item, key){
+  var vid = panelVideoEl();
+  var img = document.getElementById('step-gif');
+  if(item.video){
+    img.style.display = 'none';
+    vid.style.display = 'block';
+    if(vid.dataset.key !== key){
+      vid.dataset.key = key;
+      vid.src = item.video;
+    }
+  } else {
+    vid.pause();
+    vid.style.display = 'none';
+    img.style.display = 'block';
+    img.src = item.gif;
+  }
+}
+/* Play a clip once with its own voice; falls back to the browser voice
+   if the browser blocks audio. onDone fires when the clip ends. */
+var _guideDoneTimer = null;
+var _guideVoice = null;
+var GUIDE_VOICE = {
+  welcome:'kids_media/voice_welcome.mp3', soap:'kids_media/voice_soap.mp3', rinse:'kids_media/voice_rinse.mp3',
+  step0:'kids_media/voice_step1.mp3', step1:'kids_media/voice_step2.mp3', step2:'kids_media/voice_step3.mp3',
+  step3:'kids_media/voice_step4.mp3', step4:'kids_media/voice_step5.mp3', step5:'kids_media/voice_step6.mp3',
+  step6:'kids_media/voice_step7.mp3'
+};
+function stopGuideVoice(){ if(_guideVoice){ try{_guideVoice.pause();}catch(e){} _guideVoice=null; } }
+function audioDiag(msg){ var el=document.getElementById('audio-diag'); if(el) el.textContent='audio: '+msg; try{console.log('[audio]',msg);}catch(e){} }
+function playGuideClip(item, key, fallbackLine, onDone, asInset){
+  stopLineAudio(); stopGuideVoice();
+  var vid = panelVideoEl();
+  setPanelMedia(item, key);
+  setDespiteInset(!!asInset);
+  videoIntroDone = false;
+  /* video is muted visuals only; the voice plays as a separate Audio element,
+     the same channel the germ lines use, so it is not blocked like muted-video */
+  vid.muted = true; vid.loop = false; vid.currentTime = 0; vid.volume = 0;
+
+  var finished = false;
+  function finish(){
+    if(finished) return; finished = true;
+    clearTimeout(_guideDoneTimer); stopGuideVoice();
+    videoIntroDone = true; vid.onended = null;
+    if(vid.classList.contains('inset')){ vid.pause(); vid.style.display='none'; setDespiteInset(false); }
+    else { vid.muted = true; vid.loop = true; vid.play().catch(function(){}); }
+    if(onDone) onDone();
+  }
+
+  if(GUIDE_VOICE[key]){
+    _guideVoice = new Audio(GUIDE_VOICE[key]);
+    _guideVoice.volume = 1;
+    audioDiag('loading ' + GUIDE_VOICE[key]);
+    _guideVoice.onended = finish;
+    _guideVoice.onerror = function(){ audioDiag('FAILED ' + GUIDE_VOICE[key]); if(fallbackLine) speak(fallbackLine, true); };
+    var vp = _guideVoice.play();
+    if(vp && vp.then){
+      vp.then(function(){ audioDiag('Despite speaking'); })
+        .catch(function(err){ audioDiag('BLOCKED ' + (err&&err.name?err.name:'')); if(fallbackLine) speak(fallbackLine, true); });
+    }
+  } else {
+    vid.onended = finish;
+  }
+
+  function armFallback(){
+    var vms = (_guideVoice && isFinite(_guideVoice.duration) && _guideVoice.duration>0) ? _guideVoice.duration*1000 : 0;
+    var dms = (isFinite(vid.duration) && vid.duration>0) ? vid.duration*1000 : 10000;
+    clearTimeout(_guideDoneTimer);
+    _guideDoneTimer = setTimeout(finish, (vms||dms) + 1200);
+  }
+  if(_guideVoice){ _guideVoice.onloadedmetadata = armFallback; }
+  vid.onloadedmetadata = armFallback; armFallback();
+  vid.play().catch(function(){});
+}
+function stopPanelVideo(){
+  var vid = panelVideoEl();
+  if(!vid) return;
+  vid.onended = null;
+  vid.pause();
+}
+function stopAllPanelMedia(){
+  stopPanelVideo();
+  hideRealStep();
+  setDespiteInset(false);
+}
+function setPreludeCard(i){
+  var p = PRELUDE[i];
+  document.getElementById('step-num-display').textContent = i===0 ? 'Welcome!' : 'Get Ready!';
+  document.getElementById('inst-step-name').textContent = p.title;
+  document.getElementById('inst-how').textContent = p.how;
+  document.getElementById('watch-caption').textContent = p.caption;
+  feedback(i===0 ? 'Meet your guide! 👋' : 'Watch and get ready!','wait','');
+  setLatherRing(0,'');
+  setPips(0,false);
+}
+
+function spawnConfetti(count){
+  var colors = ['#FFE047','#00D4FF','#00C48C','#FF5A5F','#FFFFFF'];
+  for(var i=0;i<count;i++){
+    setTimeout(function(){
+      var p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.cssText = 'left:'+(Math.random()*100)+'vw;top:-10px;'
+        + 'background:'+colors[Math.floor(Math.random()*colors.length)]+';'
+        + 'width:'+(8+Math.random()*10)+'px;height:'+(8+Math.random()*10)+'px;'
+        + 'border-radius:'+(Math.random()>0.5?'50%':'2px')+';'
+        + 'animation-duration:'+(2+Math.random()*2)+'s;'
+        + 'transform:translateX('+((Math.random()-0.5)*60)+'px);';
+      document.body.appendChild(p);
+      setTimeout(function(){ p.remove(); }, 4200);
+    }, i*40);
+  }
+}
+
+/* -- Screens and nav -- */
+function showScreen(id){
+  ['home','game','score','stickers','champs'].forEach(function(s){
+    document.getElementById(s+'-screen').classList.toggle('hidden', s!==id);
+    var nb = document.getElementById('nav-'+s);
+    if(nb) nb.classList.toggle('active', s===id);
+  });
+}
+function navTo(id){
+  if(sessionActive && id!=='game'){ endLive(); }
+  clearInterval(cdInt);
+  showScreen(id);
+  if(id==='stickers') renderHistory();
+  if(id==='champs') renderChamps();
+}
+
+/* -- Sticker Book (history) -- */
+function renderHistory(){
+  var tbody = document.getElementById('hist-tbody');
+  var empty = document.getElementById('hist-empty');
+  var table = document.getElementById('hist-table');
+  var summary = document.getElementById('hist-summary');
+  if(history_.length===0){
+    empty.style.display = 'block'; table.style.display = 'none'; summary.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none'; table.style.display = 'table';
+  tbody.innerHTML = '';
+  history_.forEach(function(h,i){
+    var gc = (h.grade==='A+'||h.grade==='A') ? 'gA' : h.grade==='B' ? 'gB' : h.grade==='C' ? 'gC' : 'gD';
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td style="color:rgba(255,255,255,0.35)">'+(history_.length-i)+'</td>'
+      + '<td>'+h.datetime+'</td>'
+      + '<td>'+h.germs+'/7</td>'
+      + '<td>'+h.duration+'s</td>'
+      + '<td style="color:var(--mint);font-family:\'Fredoka One\',cursive">'+h.score+'</td>'
+      + '<td><span class="grade-pill '+gc+'">'+(h.title||h.grade)+'</span></td>'
+      + '<td style="color:'+(h.order==='Perfect'?'var(--mint)':'var(--yellow)')+'">'+h.order+'</td>';
+    tbody.appendChild(tr);
+  });
+  var avg = Math.round(history_.reduce(function(a,h){return a+h.score;},0)/history_.length);
+  var best = Math.max.apply(null, history_.map(function(h){return h.score;}));
+  var perfect = history_.filter(function(h){return h.germs===7;}).length;
+  summary.innerHTML =
+      '<div class="sum-card"><div class="sum-val">'+history_.length+'</div><div class="sum-lbl">Games played</div></div>'
+    + '<div class="sum-card"><div class="sum-val">'+avg+'%</div><div class="sum-lbl">Average score</div></div>'
+    + '<div class="sum-card"><div class="sum-val">'+best+'%</div><div class="sum-lbl">Best score</div></div>'
+    + '<div class="sum-card"><div class="sum-val">'+perfect+'</div><div class="sum-lbl">Perfect games</div></div>';
+}
+function clearHistory(fromChamps){
+  if(!confirm('Clear all saved games?')) return;
+  history_ = [];
+  saveHistory(history_);
+  renderHistory(); renderChamps();
+}
+
+/* -- Champions (leaderboard) -- */
+function renderChamps(){
+  var sorted = history_.slice().sort(function(a,b){return b.score-a.score;}).slice(0,10);
+  var top3 = document.getElementById('top3-row');
+  var list = document.getElementById('lead-list');
+  var empty = document.getElementById('lead-empty');
+  if(sorted.length===0){
+    top3.innerHTML=''; list.innerHTML=''; empty.style.display='block';
+    return;
+  }
+  empty.style.display='none';
+  var medals=['gold','silver','bronze'], trophies=['🥇','🥈','🥉'];
+  top3.innerHTML='';
+  sorted.slice(0,3).forEach(function(h,i){
+    var d = document.createElement('div');
+    d.className = 'top3-card '+(medals[i]||'');
+    d.innerHTML = '<div class="top3-trophy">'+(trophies[i]||'')+'</div>'
+      + '<div class="top3-score">'+h.score+'%</div>'
+      + '<div class="top3-name">'+(h.title||h.grade)+'</div>'
+      + '<div class="top3-date">'+h.datetime+'</div>';
+    top3.appendChild(d);
+  });
+  list.innerHTML='';
+  sorted.forEach(function(h,i){
+    var rc = i===0?'gold':i===1?'silver':i===2?'bronze':'';
+    var d = document.createElement('div');
+    d.className = 'lead-item';
+    d.innerHTML = '<div class="lead-rank '+rc+'">'+(i+1)+'</div>'
+      + '<div class="lead-info"><div class="lead-name">'+(h.title||h.grade)+' · '+h.germs+'/7 germs</div>'
+      + '<div class="lead-date">'+h.datetime+' · '+h.duration+'s</div></div>'
+      + '<div class="lead-score">'+h.score+'%</div>';
+    list.appendChild(d);
+  });
+}
+
+/* -- Settings -- */
+function openSettings(){ document.getElementById('settings-overlay').classList.add('open'); }
+function closeSettings(){ document.getElementById('settings-overlay').classList.remove('open'); }
+function overlayClick(e){ if(e.target===document.getElementById('settings-overlay')) closeSettings(); }
+function changeLang(code, btn){
+  CURRENT_LANG = code;
+  document.querySelectorAll('.lang-pill').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  SPEECH.stop();
+  populateVoices();
+  speak(L().audioOn, true);
+  if(sessionActive) setStep(currentStep);
+  if(!L().twi_mode){
+    var bar = document.getElementById('subtitle-bar');
+    if(bar) bar.classList.remove('show');
+  }
+}
+function toggleAudio(){
+  var sw = document.getElementById('audio-sw');
+  SPEECH.enabled = !SPEECH.enabled;
+  sw.classList.toggle('on', SPEECH.enabled);
+  if(SPEECH.enabled) speak(L().audioOn, true);
+  else SPEECH.stop();
+}
+function updateRateLabel(){
+  var v = parseFloat(document.getElementById('rate-slider').value);
+  document.getElementById('rate-lbl').textContent = v<0.75?'Slow':v>1.0?'Fast':'Normal';
+}
+function updateRealRateLabel(){
+  document.getElementById('rrate-lbl').textContent = REAL_RATE.toFixed(2)+'x';
+}
+function updateDemoSpeedLabel(){
+  var v = parseInt(document.getElementById('demo-speed').value);
+  document.getElementById('dspeed-lbl').textContent = v<90?'Very fast':v<120?'Fast':v<170?'Normal':'Slow';
+  /* live mode: no local tick loop */
+}
+
+/* Preload the first GIF so the game screen appears instantly */
+(function preload(){
+  STEPS.forEach(function(s){ if(s.gif){ var im = new Image(); im.src = s.gif; } });
+})();
+
+
+/* ================================================================
+   LIVE ENGINE - driven by kids_server.py over WebSocket.
+   Replaces the demo's scripted STEP_PLAN. The server owns every
+   decision (step advance, timing, scoring, redo); this dispatches
+   on the phase it sends and reports 'teach_done' when Despite has
+   finished explaining a step so the narration hold releases.
+================================================================ */
+
+/* ---- connection state ---- */
+var ws = null;
+var wsUrl = '';
+var connected = false;
+var lastPhase = null;
+var awaitingPrime = false;   /* ignore stale frames from a prior session */
+var teachActiveStep = -1;    /* which step's narration is playing now */
+var teachKind = null;
+var germDefeatShown = {};    /* germ index -> already animated */
+var runCheered = {};         /* slot -> keep_going already played */
+var _germBannerTimer = null;
+var germFailShown = {};
+var sessionActive = false;
+var reconnectTimer = null;
+
+/* Map server step index (0-6) straight to our STEPS array (same WHO order) */
+
+/* ---- camera feed ---- */
+function showCameraFrame(b64){
+  if(!b64) return;
+  var img = document.getElementById('cam-frame');
+  if(img) img.src = 'data:image/jpeg;base64,' + b64;
+}
+
+/* ---- connect / disconnect ---- */
+function unlockMedia(){
+  /* runs on the connect tap (a user gesture) so the browser permits sound */
+  try { var v=document.getElementById('step-vid'); if(v){ v.muted=true; var p=v.play(); if(p&&p.then) p.then(function(){v.pause();}).catch(function(){}); } } catch(e){}
+  try { if(window.speechSynthesis){ var u=new SpeechSynthesisUtterance(' '); u.volume=0; window.speechSynthesis.speak(u); } } catch(e){}
+  try { var a=new Audio('kids_media/voice_welcome.mp3'); a.volume=0; var ap=a.play(); if(ap&&ap.then) ap.then(function(){a.pause();a.currentTime=0;}).catch(function(){}); } catch(e){}
+  audioDiag('tap received, audio unlocked');
+}
+function defaultWsUrl(){
+  /* when the page is served by kids_server.py itself, talk back to the same
+     host/port; only fall back to the hardcoded default for file:// */
+  var loc = window.location;
+  if(loc && (loc.protocol === 'http:' || loc.protocol === 'https:')){
+    var proto = (loc.protocol === 'https:') ? 'wss://' : 'ws://';
+    return proto + loc.host + '/ws-kids';
+  }
+  return 'ws://localhost:8002/ws-kids';
+}
+function connectLive(){
+  unlockMedia();
+  var box = document.getElementById('server-addr');
+  var typed = box ? box.value.trim() : '';
+  wsUrl = typed || defaultWsUrl();
+  setConnState('connecting');
+  try { ws = new WebSocket(wsUrl); }
+  catch(e){ setConnState('error'); return; }
+
+  ws.onopen = function(){
+    connected = true;
+    setConnState('connected');
+    awaitingPrime = true;          /* wait for a fresh PRIME before showing anything */
+    resetLiveState();
+    try { ws.send('reset'); } catch(e){}
+    showScreen('game');
+    document.getElementById('manual-row').classList.remove('on');   /* no manual controls live */
+    sessionActive = true;
+    startTimer();
+  };
+  ws.onmessage = function(e){
+    var st; try { st = JSON.parse(e.data); } catch(err){ return; }
+    handleLiveStatus(st);
+  };
+  ws.onclose = function(){
+    connected = false;
+    if(sessionActive){ setConnState('lost'); scheduleReconnect(); }
+    else setConnState('idle');
+  };
+  ws.onerror = function(){ setConnState('error'); };
+}
+function scheduleReconnect(){
+  clearTimeout(reconnectTimer);
+  reconnectTimer = setTimeout(function(){
+    if(!connected && sessionActive) connectLive();
+  }, 2500);
+}
+function endLive(){
+  sessionActive = false;
+  clearTimeout(reconnectTimer);
+  stopAllPanelMedia();
+  stopLineAudio();
+  clearInterval(timerInt);
+  try { if(ws) ws.close(); } catch(e){}
+  setConnState('idle');
+  showScreen('home');
+}
+function setConnState(stateName){
+  var el = document.getElementById('conn-pill');
+  if(!el) return;
+  var map = {
+    idle:['\u25CB Not connected','#8aa'],
+    connecting:['\u25CC Connecting...','#FFE047'],
+    connected:['\u25CF Live','#00C48C'],
+    lost:['\u26A0 Reconnecting...','#FF9D00'],
+    error:['Cannot connect','#FF5A5F']
+  };
+  var m = map[stateName] || map.idle;
+  el.textContent = m[0];
+  el.style.color = m[1];
+}
+
+/* ---- reset per session ---- */
+function resetLiveState(){
+  stepsCompleted = []; stars = 0; germDefeatShown = {}; germFailShown = {};
+  welcomePlayed = false; runCheered = {};
+  teachActiveStep = -1; teachKind = null; lastPhase = null;
+  buildGermRow(); buildPips(); buildStars();
+  document.getElementById('steps-done-big').textContent = '0';
+  document.getElementById('timer-val').textContent = '0:00';
+  hideGermBanner(); hideRealStep(); setDespiteInset(false);
+}
+
+/* ================================================================
+   PHASE DISPATCH
+================================================================ */
+function handleLiveStatus(st){
+  if(!st || !st.phase) return;
+
+  /* wait for a clean PRIME before rendering, so a stale RUN frame from a
+     previous session cannot flash the wrong step */
+  if(awaitingPrime){
+    if(st.phase === 'PRIME') awaitingPrime = false;
+    else { showCameraFrame(st.frame); return; }
+  }
+
+  showCameraFrame(st.frame);
+  var phaseChanged = (st.phase !== lastPhase);
+
+  switch(st.phase){
+    case 'PRIME':     renderPrime(st); break;
+    case 'SOAP':      renderSoap(st, phaseChanged); break;
+    case 'GETSET':    renderGetset(st); break;
+    case 'TEACH':     renderTeach(st, phaseChanged); break;
+    case 'RUN':       renderRun(st, phaseChanged); break;
+    case 'REMEDIATE': renderRemediate(st, phaseChanged); break;
+    case 'RINSE':     renderRinse(st, phaseChanged); break;
+    case 'DONE':      renderDone(st, phaseChanged); break;
+  }
+  lastPhase = st.phase;
+}
+
+/* ---- PRIME: show both hands ---- */
+var welcomePlayed = false;
+function renderPrime(st){
+  setScreenMode('prime');
+  hideRealStep();
+  document.getElementById('step-num-display').textContent = 'Welcome!';
+  /* Play Despite's greeting the first time we enter PRIME this session */
+  if(!welcomePlayed){
+    welcomePlayed = true;
+    setSpotlight(true);
+    playGuideClip(PRELUDE[0], 'welcome',
+      'Hi, I am Despite! Let us wash our hands and beat the Germ Gang together!');
+  }
+  document.getElementById('inst-step-name').textContent = st.visibility_ok ? 'Great, hold still...' : 'Show me both hands!';
+  document.getElementById('inst-how').textContent = st.visibility_ok
+      ? 'Getting ready to start!'
+      : 'Put both hands where the camera can see them.';
+  var fill = st.buffer_fill || 0;
+  setLatherRing(fill, st.visibility_ok ? 'ok' : '');
+  feedback(st.visibility_ok ? 'Almost ready!' : '\uD83D\uDC50 Show your hands','wait','');
+}
+
+/* ---- SOAP gate ---- */
+function renderSoap(st, changed){
+  setScreenMode('step');            /* show camera so the child sees their hands */
+  if(changed){
+    hideRealStep();
+    /* Despite tells them to wet and soap; the SERVER clears this phase once it
+       sees rubbing motion, exactly like compliance mode. */
+    playGuideClip(PRELUDE[1], 'soap',
+      'First, wet your hands with clean water. Then rub the soap all over, like this!',
+      null, true);              /* asInset: Despite in the corner, camera visible */
+  }
+  document.getElementById('step-num-display').textContent = 'Soap Up!';
+  document.getElementById('inst-step-name').textContent = 'Wet Hands & Soap';
+  document.getElementById('inst-how').textContent = 'Rub your hands together to spread the soap!';
+  var rem = st.phase_remaining;
+  var rubbing = (st.state && st.state !== 'NO_HANDS' && st.state !== 'STILL');
+  setLatherRing(rubbing ? 0.7 : 0.15, rubbing ? 'ok' : '');
+  if(st.state === 'NO_HANDS'){
+    feedback('\uD83D\uDC50 Show your hands and rub!','wait','');
+  } else if(rubbing){
+    feedback('\u2705 Great rubbing!' + (rem!=null?'  '+Math.ceil(rem)+'s':''),'ok','compliant');
+  } else {
+    feedback('Rub your hands together!' + (rem!=null?'  '+Math.ceil(rem)+'s':''),'wait','');
+  }
+}
+
+/* ---- GETSET countdown ---- */
+function renderGetset(st){
+  setScreenMode('gate');
+  hideRealStep();
+  document.getElementById('step-num-display').textContent = 'Ready?';
+  document.getElementById('inst-step-name').textContent = 'Step 1 starts in ' + (st.countdown != null ? st.countdown : '...');
+  document.getElementById('inst-how').textContent = 'Get your hands ready!';
+  feedback('\uD83D\uDC4A Here we go!','wait','');
+}
+
+/* ---- TEACH: Despite explains; release when he finishes ---- */
+function renderTeach(st, changed){
+  setScreenMode('step');
+  var k = st.teach_step;
+  if(typeof k !== 'number' || k < 0) k = 0;
+
+  if(changed || teachActiveStep !== k || teachKind !== st.teach_kind){
+    teachActiveStep = k; teachKind = st.teach_kind;
+    currentStep = k;
+    setStep(k);
+    setSpotlight(true);
+    bubblesExpression('neutral');
+    showRealStep(k);                        /* real hands are the demonstration */
+    feedback('Listen to Despite \uD83D\uDC42','wait','');
+    var names = L().stepNames || STEPS.map(function(s){return s.name;});
+    var hows  = L().steps     || STEPS.map(function(s){return s.how;});
+    var introText = (teachKind === 'redo')
+      ? ('Let us try '+names[k]+' again! '+hows[k])
+      : L().stepIntro(k+1, names[k], STEPS[k].germName, hows[k]);
+    /* Despite explains from the corner; when he finishes, tell the server to
+       start the slot clock, exactly like the demo advancing intro -> wash */
+    playGuideClip(STEPS[k], 'step'+k, introText,
+      function(){ sendTeachDone(); },
+      true);
+  }
+}
+function sendTeachDone(){
+  if(ws && connected){ try { ws.send('teach_done'); } catch(e){} }
+}
+
+/* ---- RUN: the child performs; server scores ---- */
+function renderRun(st, changed){
+  setScreenMode('step');
+  var slot = st.current_step;
+  if(typeof slot !== 'number') return;
+
+  if(slot !== currentStep){
+    currentStep = slot;
+    setStep(slot);
+  }
+  showRealStep(slot);
+  setDespiteInset(false);         /* Despite steps aside; real hands fill screen */
+
+  /* progress ring from the server's evidence accumulation */
+  var frac = (typeof st.progress === 'number') ? st.progress : 0;
+  var compliant = !!st.is_compliant;
+  var struggling = !!st.struggling;
+  setLatherRing(frac, compliant ? 'ok' : struggling ? 'wrong' : '');
+  setPips(Math.max(0.15, (st.confidence||0)), compliant);
+
+  var sl = st.slot_left;
+  var cd = (sl!=null ? '  '+Math.ceil(sl)+'s' : '');
+  if(compliant){
+    bubblesExpression('ok');
+    /* on-screen cheer only; no spoken keep_going so nothing competes with
+       Despite's step and germ voice lines */
+    feedback((frac > 0.6 ? '\uD83D\uDD25 Keep going, almost there!' : '\u2705 Great! Wash like Despite!') + cd,'ok','compliant');
+  } else if(struggling){
+    bubblesExpression('neutral');
+    feedback('\uD83D\uDC50 Copy the hands!' + cd,'wait','');
+  } else {
+    bubblesExpression('ok');
+    feedback('\u2705 Your turn! Wash like Despite!' + cd,'ok','compliant');
+  }
+
+  applyCompleted(st.completed_steps, st.failed_steps);
+}
+
+/* germs die (or escape) as the server reveals each slot's verdict */
+function applyCompleted(completed, failed){
+  (completed||[]).forEach(function(k){
+    if(!germDefeatShown[k]){
+      germDefeatShown[k] = true;
+      if(stepsCompleted.indexOf(k) < 0) stepsCompleted.push(k);
+      document.getElementById('steps-done-big').textContent = stepsCompleted.length;
+      defeatGerm(k);
+      doFlash('green');
+      showGermBanner(k);
+      bubblesExpression('ok');
+      sayDespite('germ_'+(k+1), L().stepDone(STEPS[k].germName), true);
+      /* hold the banner for the congratulation's length (germ lines run 5-10s) */
+      var hold = (LINE_MS['germ_'+(k+1)] || 6000);
+      clearTimeout(_germBannerTimer);
+      _germBannerTimer = setTimeout(hideGermBanner, hold);
+    }
+  });
+  (failed||[]).forEach(function(k){
+    if(!germFailShown[k]){
+      germFailShown[k] = true;
+      markGermEscaped(k);
+    }
+  });
+}
+function markGermEscaped(k){
+  var g = document.getElementById('germ-'+k);
+  if(g){ g.classList.add('escaped'); }
+}
+
+/* ---- REMEDIATE: the escaped-germs round ---- */
+function renderRemediate(st, changed){
+  setScreenMode('step');
+  if(st.redo_phase === 'intro'){
+    hideRealStep(); setDespiteInset(false);
+    document.getElementById('step-num-display').textContent = 'Germs Escaped!';
+    document.getElementById('inst-step-name').textContent = 'Some germs got away!';
+    var miss = (st.redo_missed||[]).map(function(k){return STEPS[k].germName;}).join(', ');
+    document.getElementById('inst-how').textContent = miss ? ('Lets catch: '+miss) : 'Lets try those steps again!';
+    feedback('\uD83E\uDDA0 Boss round!','wrong','wrong');
+    return;
+  }
+  var k = st.redo_step;
+  if(typeof k !== 'number') return;
+
+  if(st.redo_phase === 'getready'){
+    if(k !== currentStep){ currentStep = k; setStep(k); }
+    showRealStep(k);
+    document.getElementById('step-num-display').textContent = 'Catch ' + STEPS[k].germName + '!';
+    document.getElementById('inst-step-name').textContent = STEPS[k].name;
+    feedback('Get ready... ' + (st.redo_countdown!=null?st.redo_countdown:''),'wait','');
+  } else if(st.redo_phase === 'perform'){
+    if(k !== currentStep){ currentStep = k; setStep(k); }
+    showRealStep(k);
+    var detecting = !!st.detecting;
+    setLatherRing(detecting ? 0.7 : 0.2, detecting ? 'ok' : 'wrong');
+    setPips(Math.max(0.2,(st.confidence||0)), detecting);
+    feedback(detecting ? '\u2705 Yes! Keep going!' : '\uD83D\uDC50 Copy the hands!',
+             detecting?'ok':'wrong', detecting?'compliant':'wrong');
+  }
+  applyCompleted(st.completed_steps, st.failed_steps);
+}
+
+/* ---- RINSE gate ---- */
+function renderRinse(st, changed){
+  setScreenMode('step');
+  if(changed){
+    hideGermBanner(); hideRealStep();
+    playGuideClip(RINSE, 'rinse',
+      'Now rinse off all the soap with clean water. Wash those germs down the drain!',
+      null, true);
+  }
+  document.getElementById('step-num-display').textContent = 'Rinse!';
+  document.getElementById('inst-step-name').textContent = 'Rinse Off';
+  document.getElementById('inst-how').textContent = 'Rinse your hands under clean water.';
+  var rem = st.phase_remaining;
+  var rubbing = (st.state && st.state !== 'NO_HANDS' && st.state !== 'STILL');
+  setLatherRing(rubbing ? 0.8 : 0.2, rubbing ? 'ok' : '');
+  feedback(rem != null ? ('Rinsing... '+Math.ceil(rem)+'s') : 'Rinse well!','wait','');
+}
+
+/* ---- DONE: server's official score ---- */
+function renderDone(st, changed){
+  if(!changed) return;
+  sessionActive = false;
+  clearInterval(timerInt);
+  stopAllPanelMedia();
+  showLiveScore(st);
+}
+
+/* Screen mode helper: toggles the camera inset visibility per phase */
+function setScreenMode(mode){
+  var cam = document.getElementById('cam-wrap');
+  if(cam) cam.style.display = (mode==='prime') ? 'none' : 'block';
+}
+
+/* ================================================================
+   MANUAL / NAV shims so the shared UI keeps working
+================================================================ */
+function startDemo(){ /* home button in live mode connects instead */ connectLive(); }
+function endDemo(){ endLive(); }
+function resetDemo(){ resetLiveState(); showScreen('home'); }
+
+
+
+/* ================================================================
+   LIVE SCORE - uses the server's official verdict, not a local tally
+================================================================ */
+function showLiveScore(st){
+  var n = 7;
+  var score = (typeof st.score === 'number') ? st.score : 0;
+  var grade = st.grade || 'C';
+  var passed = (typeof st.steps_done === 'number') ? st.steps_done : stepsCompleted.length;
+  var elapsed = (typeof st.duration_s === 'number') ? st.duration_s
+                : Math.floor((Date.now()-sessionStart)/1000);
+  var order = st.order || (passed===n ? 'Perfect' : 'Incomplete');
+  var results = st.results || [];
+
+  var titleMap = { 'A+':'GERM CHAMPION', 'A':'GERM BUSTER', 'B':'BUBBLE HERO',
+                   'C':'GOOD TRY', 'D':'KEEP TRAINING' };
+  var title = titleMap[grade] || 'GOOD TRY';
+
+  document.getElementById('manual-row').classList.remove('on');
+  showScreen('score');
+  spawnConfetti(passed===n ? 70 : 30);
+
+  document.getElementById('sc-stars').textContent =
+    '\u2B50'.repeat(Math.min(passed,7)) + '\u2606'.repeat(Math.max(0,7-passed));
+  setTimeout(function(){
+    document.getElementById('sarc').style.strokeDashoffset = 515*(1-score/100);
+  }, 200);
+  var c=0; var ni=setInterval(function(){
+    c=Math.min(c+2,score); document.getElementById('sc-num').textContent=c;
+    if(c>=score) clearInterval(ni);
+  },22);
+  document.getElementById('sc-grade').textContent = title;
+  document.getElementById('sc-msg').textContent =
+    passed===n ? '\uD83C\uDFC6 PERFECT! All 7 germs defeated! The Germ Gang is GONE!'
+               : 'You defeated '+passed+' out of 7 germs! Play again to beat them all!';
+  sayDespite(passed===n ? 'score_perfect' : 'score_partial', L().scoreMsg(score, title), true);
+
+  document.getElementById('st-germs').textContent = passed+'/7';
+  document.getElementById('st-time').textContent = elapsed+'s';
+  document.getElementById('st-order').textContent = order;
+
+  var bg = document.getElementById('sc-badges'); bg.innerHTML='';
+  STEPS.forEach(function(s,i){
+    var r = results[i] || {};
+    var ok = r.passed;
+    var retry = r.retry;
+    var b=document.createElement('div');
+    b.className='badge '+(ok?'ok':'miss');
+    b.textContent=(ok?(retry?'\u21BB ':'\u2713 '):'\u2717 ')+s.emoji+' '+s.germName;
+    bg.appendChild(b);
+  });
+
+  history_.unshift({
+    id:Date.now(), datetime:new Date().toLocaleString(),
+    germs:passed, duration:elapsed, score:score, grade:grade, title:title, order:order
+  });
+  if(history_.length>50) history_=history_.slice(0,50);
+  saveHistory(history_);
+
+  var cd=15; clearInterval(cdInt);
+  document.getElementById('sc-cd').textContent='Back to home in '+cd+'s...';
+  cdInt=setInterval(function(){
+    cd--; document.getElementById('sc-cd').textContent='Back to home in '+cd+'s...';
+    if(cd<=0){ clearInterval(cdInt); endLive(); }
+  },1000);
+}
+
+</script>
+</body>
+</html>
